@@ -1,5 +1,5 @@
-# [WIP] Asgardio React Native OIDC SDK & Samples
-Repository containing the source of Asgardio React Native OIDC SDK & Samples.
+# [WIP] Asgardeo React Native OIDC SDK & Samples
+Repository containing the source of Asgardeo React Native OIDC SDK & Samples.
 
 
 [![Stackoverflow](https://img.shields.io/badge/Ask%20for%20help%20on-Stackoverflow-orange)](https://stackoverflow.com/questions/tagged/wso2is)
@@ -29,7 +29,7 @@ Repository containing the source of Asgardio React Native OIDC SDK & Samples.
 
 ## Introduction
 
-Asgardio's OIDC SDK for React Native allows Mobile Applications to use OIDC or OAuth2 authentication in a simple and secure way. By using Asgardio and the React Native OIDC SDK, Mobile application developers will be able to add identity management to their Mobile Applications with more ease.
+Asgardeo's OIDC SDK for React Native allows Mobile Applications to use OIDC or OAuth2 authentication in a simple and secure way. By using Asgardeo and the React Native OIDC SDK, Mobile application developers will be able to add identity management to their Mobile Applications with more ease.
 
 ## Install
 
@@ -51,7 +51,7 @@ Please read [Contributing to the Code Base](http://wso2.github.io/) for details 
 
 ### Reporting Issues
 
-We encourage you to report issues, improvements, and feature requests creating [Github Issues](https://github.com/asgardio/asgardio-react-native-oidc-sdk/issues).
+We encourage you to report issues, improvements, and feature requests creating [Github Issues](https://github.com/asgardeo/asgardeo-react-native-oidc-sdk/issues).
 
 Important: And please be advised that security issues must be reported to security@wso2com, not as GitHub issues, in order to reach the proper audience. We strongly advise following the WSO2 Security Vulnerability Reporting Guidelines when reporting the security issues.
 
