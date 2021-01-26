@@ -9,7 +9,6 @@ class LocalStorage {
 
   async getData(key:string){
     const _value = await AsyncStorage.getItem(key)
-  //console.log(_value)
     return _value
   }
    

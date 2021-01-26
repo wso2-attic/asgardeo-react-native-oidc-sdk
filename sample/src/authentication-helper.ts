@@ -18,11 +18,11 @@
 
 import { KeyLike } from "crypto";
 import {fetch} from 'react-native-ssl-pinning';
-
 import { SERVICE_RESOURCES} from "./oidc-endpoints";
 import { AsgardeoAuthException, AsgardeoAuthNetworkException } from "./exception";
 import { DataLayer,AuthClientConfig, OIDCProviderMetaData, TokenResponse,OIDC_SCOPE,TOKEN_TAG,USERNAME_TAG,SCOPE_TAG,CLIENT_ID_TAG,CLIENT_SECRET_TAG } from "@asgardeo/auth-js";
 import { AuthenticationUtils, CryptoUtils } from "./utils";
+import { auth } from "./store";
 
 export class AuthenticationHelper<T> {
     private _dataLayer: DataLayer<T>;
@@ -181,9 +181,10 @@ export class AuthenticationHelper<T> {
 
 
     public async clearUserSessionData(): Promise<void> {
-        await this._dataLayer.removeOIDCProviderMetaData();
-        await this._dataLayer.removeTemporaryData();
-        await this._dataLayer.removeSessionData();
+        
+        await auth.getDataLayer().removeOIDCProviderMetaData();
+        await auth.getDataLayer().removeTemporaryData();
+        await auth.getDataLayer().removeSessionData();
     }
 
     public async replaceCustomGrantTemplateTags(text: string): Promise<string> {
