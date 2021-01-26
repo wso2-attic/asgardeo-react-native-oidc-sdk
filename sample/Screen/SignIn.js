@@ -21,10 +21,14 @@ const SignIn =({route,navigation}) =>{
       }
 
       useEffect(() => {
+        
         Linking.addEventListener("url", this.handleUrl);   
        }, []);
-
+       let unmounded= false;
         handleUrl=async (Authurl)=>{
+          console.log(Authurl,"eee",unmounded)
+          
+          if (!unmounded){
           SignInHandleUrl(Authurl,route.params.config).then((token )=>{
            
             setAuthState({...token})
@@ -43,8 +47,8 @@ const SignIn =({route,navigation}) =>{
 
           const SignOutURL = await getSignOutURL()
             // console.log("SignOutURL",SignOutURL) 
-
-      }
+          unmounded = true;
+      }}
       
       handleRefreshtoken =async () =>{
         refreshAccessToken(route.params.config).then(reftoken =>{
@@ -74,6 +78,7 @@ const SignIn =({route,navigation}) =>{
           }else{
             authState
           }
+          unmounded = true;
         
       }
 
