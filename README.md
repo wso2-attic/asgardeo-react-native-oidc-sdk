@@ -96,7 +96,7 @@ sections listed below.
 1. Create a suitable Android Virtual Device by run `react-native run-android` command in project directory terminal.
 
 2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config`
-   file to “10.0.2.2”. Refer the documentation on [emulator-networking](https://developer.android.com/studio/run/emulator-networking)
+   file to “10.0.2.2”. Refer the documentation on [emulator-networking](https://reactnative.dev/docs/environment-setup)
 
 3. By default IS uses a self-signed certificate. If you are using the default pack without
     changing to a CA signed certificate, follow this [guide](https://developer.android.com/training/articles/security-config) to get rid of SSL issues.
