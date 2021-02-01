@@ -1,7 +1,7 @@
 import React, {useEffect,useState} from 'react';
 import {Linking,Alert} from 'react-native';
 import {Page,Form,FormLabel,FormValue,Heading,ButtonContainer,Button} from '../components'
-import {isAuthenticated,getSignOutURL,userInformation,refreshAccessToken,getAccessToken,requestAccessTokenDetails,SignOut, getOIDCServiceEndpoints,getDecodedIDToken,revokeAccessToken}from '../src/authenticate'
+import {requestAccessTokenDetails,SignOut,getSignOutURL,userInformation,refreshAccessToken,isAuthenticated,getAccessToken, getOIDCServiceEndpoints,getDecodedIDToken,revokeAccessToken}from '../src/authenticate'
 
 
 const defaultAuthState = {
@@ -12,48 +12,52 @@ const defaultAuthState = {
   scope:"",
   haslogin:false
 };
+
 const SignIn =({route,navigation}) =>{    
 
   const [authState, setAuthState] = useState(defaultAuthState);
    
       if (authState.haslogin==false){
-      Linking.openURL(route.params.url)
+
+        Linking.openURL(route.params.url) // Linking the AuthorizeUrl through the internet
+
       }
 
       useEffect(() => {
         
-        Linking.addEventListener("url", handleUrl);   
-       }, []);
-       let unmounded= false;
-        handleUrl=async (Authurl)=>{
+        Linking.addEventListener("url", handleAuthUrl);   
+
+      }, []);
+
+
+        let unmounded= false;
+
+        handleAuthUrl= async (Url)=>{
           
          
-         if (!unmounded){
-          requestAccessTokenDetails(Authurl,route.params.config).then((token )=>{ // get param of authorization url and return token details
-            console.log("ReAccessToken", token)
-            setAuthState({...token})
-        
-          }).catch((error)=>{
-              console.log(error)
-          });
-         
-          unmounded = true;
-      }
-
+          if (!unmounded){
+            requestAccessTokenDetails(Url,route.params.config).then((token )=>{ // get param of authorization url and return token details
+              //console.log("ReAccessToken", token)
+              setAuthState({...token})
+          
+            }).catch((error)=>{
+                console.log(error)
+            });
+          
+            unmounded = true;
+          }
+          //const endpoints = await getOIDCServiceEndpoints();
+          //console.log("endpoints", endpoints)
+          //const decodedIdToken = await getDecodedIDToken();
+          //console.log("decodedIdToken", decodedIdToken)
+          //const accessToken = await getAccessToken();
+          //console.log("accesstoken", accessToken)
+          //console.log(await isAuthenticated())
+          
+        }
       
-
-    const endpoints = await getOIDCServiceEndpoints();
-    //console.log("endpoints", endpoints)
-    const decodedIdToken = await getDecodedIDToken();
-    //console.log("decodedIdToken", decodedIdToken)
-    const accessToken = await getAccessToken();
-    //console.log("accesstoken", accessToken)
-    console.log(await isAuthenticated())
-    
-    }
-      
-      handleRefreshtoken =async () =>{
-        refreshAccessToken(route.params.config).then(reftoken =>{
+      handleRefreshtoken =async () =>{                                   // refreshtoken
+        refreshAccessToken(route.params.config).then(reftoken =>{ 
             setAuthState({...reftoken,haslogin:true})
   
         }).catch((error)=>{
@@ -62,36 +66,36 @@ const SignIn =({route,navigation}) =>{
       }
 
 
-      handlesignOut =async ()=>{
+      handleSignOut = async ()=>{                                      // signout
         const signOutUrl = await getSignOutURL()
-        console.log("signOutUrl",signOutUrl)
+        //console.log("signOutUrl",signOutUrl)
         Linking.openURL(signOutUrl)
-      }
+        }
       
-      useEffect(() => {
-        Linking.addEventListener("url", handleopenUrl);   
-       }, []);
+        useEffect(() => {
+          Linking.addEventListener("url", handleopenUrl);   
+        }, []);
 
-      handleopenUrl=async (Url)=>{
-        _signOut = SignOut(Url)
-        
-          if (_signOut==true){
-           
-            navigation.navigate("LoginScreen");
-          }else{
-            authState
-          }
-          unmounded = true;
-        
+        handleopenUrl=async (Url)=>{
+          _signOut = SignOut(Url)
+          
+            if (_signOut==true){
+            
+              navigation.navigate("LoginScreen");
+            }else{
+              authState
+            }
+            unmounded = true;
+          
       }
 
-      UserInfoAlert = async() =>{
+      UserInfoAlert = async() =>{                                     // UserInfo
         const UserInfo =  await userInformation()
         Alert.alert(
           'User Info',
           "User Name : "+ UserInfo.username+"\n"+"User Email : "+ UserInfo.email,
           
-          console.log("User Name :",UserInfo),
+          console.log("User info",UserInfo),
           // revokeAccessToken(route.params.config).then((response)=>{
           //    console.log("revokeAccess",response);
           //  }).catch((error)=>{
@@ -123,7 +127,7 @@ const SignIn =({route,navigation}) =>{
        <ButtonContainer>
         {!!authState.accessToken ? (
           <>
-            <Button  onPress={handlesignOut} text="SignOut"  color="#FF8000"   />
+            <Button  onPress={handleSignOut} text="SignOut"  color="#FF8000"   />
             
           </>
         ) : null}

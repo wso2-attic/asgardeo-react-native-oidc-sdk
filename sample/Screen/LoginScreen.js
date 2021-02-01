@@ -33,12 +33,13 @@ class LoginScreen extends React.Component {
       SignOutURL: "http://10.0.2.2:8081"
     };
 
-
+    // initializes the SDK with the config data
     const _init = await initialize(Config) 
 
-    const _dataLayer = await getDataLayer()
-      console.log("dataLayer",_dataLayer)
+     //const _dataLayer = await getDataLayer()
+     // console.log("dataLayer",_dataLayer)
 
+    // authenticate with Identity server
     getAuthorizationURL(Config).then((url) => {
 
         this.props.navigation.navigate("SignIn",{url:url,config:Config})
