@@ -128,7 +128,7 @@ sections listed below.
 
 #### Running in an Android Device
 1. Enable USB Debugging in the Developer Options in the Android Device. Refer documentation on
-   [Run your App](https://developer.android.com/training/basics/firstapp/running-app).
+   [Run your App](https://reactnative.dev/docs/running-on-device).
 
 2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config`  file and the hostnames specified under `hostname` config
    in the `<IS_HOME>/repository/conf/deployment.toml` file to the IP Address of local machine.
