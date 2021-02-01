@@ -25,14 +25,14 @@ import { AuthenticationUtils, CryptoUtils } from "./utils";
 import { auth } from "./store";
 
 export class AuthenticationHelper<T> {
-    private _dataLayer: DataLayer<T>;
+    
     private _config: () => Promise<AuthClientConfig>;
     private _oidcProviderMetaData: () => Promise<OIDCProviderMetaData>;
 
     public constructor(dataLayer: DataLayer<T>) {
-        this._dataLayer = dataLayer;
-        this._config = async () => await this._dataLayer.getConfigData();
-        this._oidcProviderMetaData = async () => await this._dataLayer.getOIDCProviderMetaData();
+       
+        this._config = async () => await auth.getDataLayer().getConfigData();
+        this._oidcProviderMetaData = async () => await auth.getDataLayer().getOIDCProviderMetaData();
     }
 
     public async resolveWellKnownEndpoint(): Promise<string> {
@@ -72,7 +72,7 @@ export class AuthenticationHelper<T> {
 
 
     public async validateIdToken(idToken: string): Promise<boolean> {
-        const jwksEndpoint = (await this._dataLayer.getOIDCProviderMetaData()).jwks_uri;
+        const jwksEndpoint = (await auth.getDataLayer().getOIDCProviderMetaData()).jwks_uri;
         
         if (!jwksEndpoint || jwksEndpoint.trim().length === 0) {
             return Promise.reject(
@@ -190,7 +190,7 @@ export class AuthenticationHelper<T> {
     public async replaceCustomGrantTemplateTags(text: string): Promise<string> {
         let scope = OIDC_SCOPE;
         const configData = await this._config();
-        const sessionData = await this._dataLayer.getSessionData();
+        const sessionData = await auth.getDataLayer().getSessionData();
 
         if (configData.scope && configData.scope.length > 0) {
             if (!configData.scope.includes(OIDC_SCOPE)) {
@@ -226,7 +226,7 @@ export class AuthenticationHelper<T> {
             return this.validateIdToken(data.id_token)
                 .then(async (valid) => {
                     if (valid) {
-                        await this._dataLayer.setSessionData(data);
+                        await auth.getDataLayer().setSessionData(data);
                         const tokenResponse: TokenResponse = {
                             accessToken: data.access_token,
                             expiresIn: data.expires_in,
@@ -272,7 +272,8 @@ export class AuthenticationHelper<T> {
                 scope: data.scope,
                 tokenType: data.token_type
             };
-            await this._dataLayer.setSessionData((data))
+            await auth.getDataLayer().setSessionData(data)
+            //await auth.getDataLayer().setSessionData((data))
             return Promise.resolve(tokenResponse);
         }
     }

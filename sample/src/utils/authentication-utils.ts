@@ -16,13 +16,13 @@
 * under the License.
 */
 
-import { AuthenticatedUserInfo, DecodedIDTokenPayload, TokenRequestHeader } from "../models";
+import { AuthenticatedUserInfo, DecodedIDTokenPayload, TokenRequestHeader } from "@asgardeo/auth-js";
 import { CryptoUtils } from "../utils";
 
 export class AuthenticationUtils {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     private constructor() {}
-
+    
     public static getAuthenticatedUserInfo(idToken: string): AuthenticatedUserInfo {
         const payload: DecodedIDTokenPayload = CryptoUtils.decodeIDToken(idToken);
         const emailAddress: string = payload.email ? payload.email : null;

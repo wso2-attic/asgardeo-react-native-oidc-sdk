@@ -1,8 +1,8 @@
 import React, {useEffect,useState} from 'react';
-import {Linking} from 'react-native';
+import {Linking,Alert} from 'react-native';
 import {Page,Form,FormLabel,FormValue,Heading,ButtonContainer,Button} from '../components'
-import {getSignOutURL,userInformation,refreshAccessToken, getDataLayer} from '../src/authenticate'
-import {SignInHandleUrl,SignOutHandleUrl} from '../src/handleUrl'
+import {isAuthenticated,getSignOutURL,userInformation,refreshAccessToken,getAccessToken,requestAccessTokenDetails,SignOut, getOIDCServiceEndpoints,getDecodedIDToken,revokeAccessToken}from '../src/authenticate'
+
 
 const defaultAuthState = {
   accessToken: '',
@@ -15,40 +15,42 @@ const defaultAuthState = {
 const SignIn =({route,navigation}) =>{    
 
   const [authState, setAuthState] = useState(defaultAuthState);
-    console.log(authState)
+   
       if (authState.haslogin==false){
       Linking.openURL(route.params.url)
       }
 
       useEffect(() => {
         
-        Linking.addEventListener("url", this.handleUrl);   
+        Linking.addEventListener("url", handleUrl);   
        }, []);
        let unmounded= false;
         handleUrl=async (Authurl)=>{
-          console.log(Authurl,"eee",unmounded)
           
-          if (!unmounded){
-          SignInHandleUrl(Authurl,route.params.config).then((token )=>{
-           
+         
+         if (!unmounded){
+          requestAccessTokenDetails(Authurl,route.params.config).then((token )=>{ // get param of authorization url and return token details
+            console.log("ReAccessToken", token)
             setAuthState({...token})
         
           }).catch((error)=>{
               console.log(error)
           });
-
-
-            
-          const UserInfo =  await userInformation()
-            console.log("UserInfo",UserInfo)
-
-          const _dataLayer =await getDataLayer()
-            // console.log("dataLayer",_dataLayer.getSessionData())
-
-          const SignOutURL = await getSignOutURL()
-            // console.log("SignOutURL",SignOutURL) 
+         
           unmounded = true;
-      }}
+      }
+
+      
+
+    const endpoints = await getOIDCServiceEndpoints();
+    //console.log("endpoints", endpoints)
+    const decodedIdToken = await getDecodedIDToken();
+    //console.log("decodedIdToken", decodedIdToken)
+    const accessToken = await getAccessToken();
+    //console.log("accesstoken", accessToken)
+    console.log(await isAuthenticated())
+    
+    }
       
       handleRefreshtoken =async () =>{
         refreshAccessToken(route.params.config).then(reftoken =>{
@@ -61,18 +63,19 @@ const SignIn =({route,navigation}) =>{
 
 
       handlesignOut =async ()=>{
-        const signOut = await getSignOutURL()
-        Linking.openURL(signOut)
+        const signOutUrl = await getSignOutURL()
+        console.log("signOutUrl",signOutUrl)
+        Linking.openURL(signOutUrl)
       }
       
       useEffect(() => {
-        Linking.addEventListener("url", this.handleopenUrl);   
+        Linking.addEventListener("url", handleopenUrl);   
        }, []);
 
-      handleopenUrl=async (Authu)=>{
-        _nav = SignOutHandleUrl(Authu)
+      handleopenUrl=async (Url)=>{
+        _signOut = SignOut(Url)
         
-          if (_nav==true){
+          if (_signOut==true){
            
             navigation.navigate("LoginScreen");
           }else{
@@ -80,6 +83,23 @@ const SignIn =({route,navigation}) =>{
           }
           unmounded = true;
         
+      }
+
+      UserInfoAlert = async() =>{
+        const UserInfo =  await userInformation()
+        Alert.alert(
+          'User Info',
+          "User Name : "+ UserInfo.username+"\n"+"User Email : "+ UserInfo.email,
+          
+          console.log("User Name :",UserInfo),
+          // revokeAccessToken(route.params.config).then((response)=>{
+          //    console.log("revokeAccess",response);
+          //  }).catch((error)=>{
+          //     console.error(error);
+          // })
+          
+        );
+            
       }
 
       return (
@@ -103,17 +123,20 @@ const SignIn =({route,navigation}) =>{
        <ButtonContainer>
         {!!authState.accessToken ? (
           <>
-            <Button
-              onPress={handlesignOut}
-              text="SignOut"
-              color="#DA2536"
-            />
+            <Button  onPress={handlesignOut} text="SignOut"  color="#FF8000"   />
             
           </>
         ) : null}
+
         {!!authState.refreshToken ? (
-          <Button onPress={handleRefreshtoken} text="Refresh" color="#24C2CB" />
+          <Button onPress={UserInfoAlert} text="UserInfo" color="#000066" />
         ) : null}
+
+        {!!authState.refreshToken ? (
+          <Button onPress={handleRefreshtoken} text="Refresh" color="#FF3333" />
+        ) : null}
+
+        
         
       </ButtonContainer>
 

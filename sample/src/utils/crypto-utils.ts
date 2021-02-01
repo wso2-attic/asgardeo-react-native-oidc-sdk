@@ -24,7 +24,7 @@ import sha256 from "crypto-js/sha256";
 import parseJwk from "../../node_modules/jose/dist/browser/jwk/parse";
 import jwtVerify, { KeyLike } from "../../node_modules/jose/dist/browser/jwt/verify";
 import { AsgardeoAuthException } from "../exception";
-import { DecodedIDTokenPayload, JWKInterface } from "../models";
+import { DecodedIDTokenPayload, JWKInterface } from "@asgardeo/auth-js";
 
 export class CryptoUtils {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
