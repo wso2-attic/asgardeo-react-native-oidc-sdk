@@ -94,7 +94,7 @@ sections listed below.
     };
    ```
 
-### Running the sample
+## Try Out the Sample Apps
 
 #### Running in an Android Emulator
 
@@ -168,8 +168,6 @@ sections listed below.
 6. Select the Android Device as the Deployment Target.
 
 7. Run the the module `sample` on the selected Android Device.
-
-## Try Out the Sample Apps
 
 ## APIs
 
