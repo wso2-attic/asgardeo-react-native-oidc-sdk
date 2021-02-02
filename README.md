@@ -168,6 +168,114 @@ sections listed below.
 
 
 ## APIs
+The SDK provides some APIs necessary methods to implement an authentication.
+
+### initialize
+
+ ```TypeScript
+ initialize=async(config):Promise<void> ;
+ ```
+ 
+#### Arguments
+1. config:
+   This config contains the ClientID, server Origin, SigINRedirectURL, SighOutRedirectUrl,and etc. This information needed to umplement the authentication.
+
+#### Description
+
+This method initializes the config data instance.
+
+#### Example
+
+```TypeScript    
+const Config ={
+      serverOrigin:"https://10.0.2.2:9443",
+      signInRedirectURL:"http://10.0.2.2:8081",
+      clientID: "Client ID",
+      SignOutURL: "http://10.0.2.2:8081/Login"
+    };
+
+    
+await initialize(Config) 
+ ```
+ ---
+ 
+### getDataLayer
+
+```TypeScript 
+getDataLayer= async () 
+```
+
+#### Description
+
+This method returns DataLayer objects used by the SDK to store authentication data.
+
+#### Example
+
+```TypeScript
+const _dataLayer = await getDataLayer();
+```
+---
+### getAuthorizationURL
+
+```TypeScript
+getAuthorizationURL= async(config): Promise<String>
+```
+#### Arguments
+1. config:
+   This config contains the ClientID, server Origin, SigINRedirectURL, SighOutRedirectUrl,and etc. This information needed to umplement the authentication.
+   
+#### Description
+
+This method returns a Promise resolve with the authorization URL.
+Then the user can redirect to this URL to authenticate themselves and athorize the client.
+
+#### Example
+
+```TypeScript
+getAuthorizationURL(Config).then((url) => {
+     Linking.openURL(url)
+}).catch((error) => {
+     console.error(error);
+});
+```
+---
+### requestAccessTokenDetails
+
+```TypeScript
+requestAccessTokenDetails = (AuthUrl,config)
+```
+#### Arguments
+1. AuthUrl
+   This is a url. After the user signs in with using Identity server can get this url. It contains sessionState and authorizationCode these are obtained from identity server.
+          
+2. config:
+   This config contains the ClientID, server Origin, SigINRedirectURL, SighOutRedirectUrl,and etc. This information needed to umplement the authentication.
+
+#### Description
+This method uses the authorization code and session state to send a request to the token endpoint to obtain the acess token and the id token. The sign-in functionality can be implemented by calling the getAuthorizationURL method followed by this method.
+
+#### Example
+```TypeScript
+requestAccessTokenDetails(AuthUrl,Config).then((token)=>{ 
+    console.log(token)
+}).catch((error)=>{
+    console.log(error)
+});
+```
+---
+### getSignOutUrl
+```
+getSignOutURL = async ()
+```
+#### Description
+This method returns the sign-out URL to which the user should be redirected to be signed out from the server.
+The user should be redirect to this URL in order to sign out from the server.
+
+#### Example
+```TypeScript
+const signOutUrl = await getSignOutURL()
+```
+---
 
 ## Develop
 
