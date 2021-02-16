@@ -1,0 +1,13 @@
+
+{
+    "command": {
+        "version": {
+            "message": "[Asgardeo Release] [GitHub Actions] [Release %s] Bump version"
+        }
+    },
+    "packages": [
+        "asgardio-react-native-oidc-sdk/*",
+        "sample/*"
+    ],
+    "version": "0.1.0"
+}
