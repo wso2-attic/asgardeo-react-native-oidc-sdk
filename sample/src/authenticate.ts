@@ -83,13 +83,12 @@ import url from 'url';
      * that resolves with the token and other relevant data.
      *
      * @param Authurl - The authorization url.
-     * @param config - The Config details.
      *
      * @return {Promise<TokenResponse>} - A Promise that resolves with the token response.
      *
      * @example
      * ```
-     * requestAccessTokenDetails(Authurl,route.params.config).then((token )=>{ // get param of authorization url and return token details
+     * requestAccessTokenDetails(Authurl).then((token )=>{ // get param of authorization url and return token details
      *      console.log("ReAccessToken", token)
      *     setAuthState({...token})
      *
@@ -99,22 +98,23 @@ import url from 'url';
      * ```
      *
      */
-    export const requestAccessTokenDetails = (Authurl,config) =>{
+    export const requestAccessTokenDetails = (Authurl) =>{
         let urlObject = url.parse(Authurl.url);
         const data_list =urlObject.query.split('&')
         const code =data_list[0].split('=')[1]
         const session_state =data_list[1].split('=')[1]
 
-        return requestAccessToken(code,session_state,config)
+        return requestAccessToken(code,session_state)
 
     }
 
-    export const requestAccessToken = async(authorizationCode, sessionState,config): Promise<TokenResponse>=>{
+    export const requestAccessToken = async(authorizationCode, sessionState): Promise<TokenResponse>=>{
         
         const data = auth.getDataLayer();
+        console.log()
         const  _authenticationHelper = new AuthenticationHelper(data);
         const tokenEndpoint = (await data.getOIDCProviderMetaData()).token_endpoint;
-        const configData = await config;
+        const configData = await auth.getDataLayer().getConfigData();
         
         if (!tokenEndpoint || tokenEndpoint.trim().length === 0) {
             return Promise.reject(
@@ -204,7 +204,7 @@ import url from 'url';
      *
      * @example
      * ```
-     * refreshAccessToken(config).then((response)=>{
+     * refreshAccessToken().then((response)=>{
      *  // console.log(response);
      * }).catch((error)=>{
      *  // console.error(error);
@@ -213,11 +213,11 @@ import url from 'url';
      *
      * 
      */
-    export const refreshAccessToken = async (config): Promise<TokenResponse> => {
+    export const refreshAccessToken = async (): Promise<TokenResponse> => {
             const data = auth.getDataLayer();
             const  _authenticationHelper = new AuthenticationHelper(data);
             const tokenEndpoint = (await data.getOIDCProviderMetaData()).token_endpoint;
-            const configData = await config;
+            const configData = await auth.getDataLayer().getConfigData();
             const sessionData = await data.getSessionData();
             
             if (!sessionData.refresh_token) {
@@ -405,24 +405,23 @@ import url from 'url';
      * This method revokes the access token.
      *
      * **This method also clears the authentication data.**
-     * @param config - The configData.
      *
      * @return {response}- A Promise that returns the response of the revoke-access-token request.
      *
      * @example
      * ```
-     * revokeAccessToken(Config).then((response)=>{
+     * revokeAccessToken().then((response)=>{
      *  // console.log(response);
      * }).catch((error)=>{
      *  // console.error(error);
      * });
      * ```
      */
-    export const revokeAccessToken= async(Config)=> {
+    export const revokeAccessToken= async()=> {
         const data = auth.getDataLayer();
         const  _authenticationHelper = new AuthenticationHelper(data);
         const revokeTokenEndpoint = (await data.getOIDCProviderMetaData()).revocation_endpoint;
-        const configData = await Config;
+        const configData = await auth.getDataLayer().getConfigData();
 
         if (!revokeTokenEndpoint || revokeTokenEndpoint.trim().length === 0) {
             return Promise.reject(
@@ -547,17 +546,4 @@ import url from 'url';
     export const setPKCECode= async(pkce:string)=>{
         return await auth.setPKCECode(pkce)
     }
-     /**
-     * This method returns if the sign-out is successful or not.
-     *
-     * @param {string} signOutRedirectUrl - The URL to which the user has been redirected to after signing-out.
-     *
-     * **The server appends path parameters to the `signOutRedirectURL` and these path parameters
-     *  are required for this method to function.**
-     *
-     * @return {boolean} - `true` if successful, `false` otherwise.
-     *
-     */   
-    export const isSignOutSuccessful= async (signOutRedirectURl:string)=>{
-        return SignOut(signOutRedirectURl);
-    }
+

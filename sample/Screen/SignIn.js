@@ -14,7 +14,7 @@ const defaultAuthState = {
 };
 
 const SignIn =({route,navigation}) =>{    
-
+  
   const [authState, setAuthState] = useState(defaultAuthState);
    
       if (authState.haslogin==false){
@@ -34,10 +34,10 @@ const SignIn =({route,navigation}) =>{
 
         handleAuthUrl= async (Url)=>{
           
-         
           if (!unmounded){
-            requestAccessTokenDetails(Url,route.params.config).then((token )=>{ // get param of authorization url and return token details
+            requestAccessTokenDetails(Url).then((token )=>{ // get param of authorization url and return token details
               //console.log("ReAccessToken", token)
+              
               setAuthState({...token})
           
             }).catch((error)=>{
@@ -57,7 +57,7 @@ const SignIn =({route,navigation}) =>{
         }
       
       handleRefreshtoken =async () =>{                                   // refreshtoken
-        refreshAccessToken(route.params.config).then(reftoken =>{ 
+        refreshAccessToken().then(reftoken =>{ 
             setAuthState({...reftoken,haslogin:true})
   
         }).catch((error)=>{
@@ -68,7 +68,7 @@ const SignIn =({route,navigation}) =>{
 
       handleSignOut = async ()=>{                                      // signout
         const signOutUrl = await getSignOutURL()
-        //console.log("signOutUrl",signOutUrl)
+        console.log("signOutUrl",signOutUrl)
         Linking.openURL(signOutUrl)
         }
       
@@ -93,10 +93,10 @@ const SignIn =({route,navigation}) =>{
         const UserInfo =  await userInformation()
         Alert.alert(
           'User Info',
-          "User Name : "+ UserInfo.username+"\n"+"User Email : "+ UserInfo.email,
+          "User Name : "+ UserInfo.username,
           
-          console.log("User info",UserInfo),
-          // revokeAccessToken(route.params.config).then((response)=>{
+          console.log("User info",UserInfo,"Decode IDToken",await getDecodedIDToken())
+          // revokeAccessToken().then((response)=>{
           //    console.log("revokeAccess",response);
           //  }).catch((error)=>{
           //     console.error(error);
@@ -109,6 +109,7 @@ const SignIn =({route,navigation}) =>{
       return (
           <Page>
           {!!authState.accessToken ? (
+             
              <Form>
              <FormLabel>accessToken</FormLabel>
                 <FormValue>{authState.accessToken}</FormValue>

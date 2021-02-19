@@ -21,6 +21,7 @@ Repository containing the source of Asgardeo React Native OIDC SDK & Samples.
 - [Develop](#develop)
   - [Prerequisites](#prerequisites)
   - [Installing Dependencies](#installing-dependencies)
+  - [Helpful Links](#helpful-links)
 - [Contribute](#contribute)
   - [Reporting Issues](#reporting-issues)
 - [License](#license)
@@ -507,7 +508,17 @@ setPKCECode("pkce");
 
 ### Prerequisites
 
+[React Native Environment setup](https://reactnative.dev/docs/environment-setup)
+
+Android development environment
+
 ### Installing Dependencies
+
+### Helpful Links
+
+[React Native Doc](https://reactnative.dev/docs/environment-setup)
+[WSO2 Identity Server Doc](https://is.docs.wso2.com/en/latest/)
+[SSL issue handling Doc](https://is.docs.wso2.com/en/5.9.0/setup/changing-the-hostname/)
 
 ## Contribute
 

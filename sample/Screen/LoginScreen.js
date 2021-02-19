@@ -26,15 +26,24 @@ class LoginScreen extends React.Component {
 
   handleSubmitPress = async () => {
     // Create a config object containing the necessary configurations.
-    const Config ={
-      serverOrigin:"https://10.0.2.2:9443",
-      signInRedirectURL:"http://10.0.2.2:8081/Screen/LoginScreen",
-      clientID: "iMc7TiIaIFafkd5hA5xf7kGiAWUa",
-      SignOutURL: "http://10.0.2.2:8081"
-    };
+     const Config ={
+       serverOrigin:"https://10.0.2.2:9443",
+       signInRedirectURL:"http://10.0.2.2:8081",
+       clientID: "iMc7TiIaIFafkd5hA5xf7kGiAWUa",
+       //SignOutURL: "http://10.0.2.2:8081"
+     };
+
+   // for device
+    //  const Config ={
+    //    serverOrigin:"https://192.168.43.29:9443",
+    //    signInRedirectURL:"http://192.168.43.29:8081",
+    //    clientID: "M1eM7_pf45m0fKJkfCDUTI6Demca",
+    //    SignOutURL: "http://192.168.43.29:8081"
+    //  };
+
 
     // initializes the SDK with the config data
-    const _init = await initialize(Config) 
+    await initialize(Config) 
 
      //const _dataLayer = await getDataLayer()
      // console.log("dataLayer",_dataLayer)
@@ -42,7 +51,7 @@ class LoginScreen extends React.Component {
     // authenticate with Identity server
     getAuthorizationURL(Config).then((url) => {
 
-        this.props.navigation.navigate("SignIn",{url:url,config:Config})
+        this.props.navigation.navigate("SignIn",{url:url})
     })
     .catch((error) => {
         console.error(error);
