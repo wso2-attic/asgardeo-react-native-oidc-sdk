@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="true">localhost</domain>
+    <domain includeSubdomains="true">10.0.2.2</domain>
+        <trust-anchors>
+            <certificates src="@raw/wso2carbon"/>
+        </trust-anchors>
+    <domain includeSubdomains="true">192.168.43.29</domain>
+    <base-config cleartextTrafficPermitted="true"/>
+  </domain-config>
+</network-security-config>
+

@@ -1,7 +1,7 @@
 import React, {useEffect,useState} from 'react';
 import {Linking,Alert} from 'react-native';
 import {Page,Form,FormLabel,FormValue,Heading,ButtonContainer,Button} from '../components'
-import {requestAccessTokenDetails,SignOut,getSignOutURL,userInformation,refreshAccessToken,isAuthenticated,getAccessToken, getOIDCServiceEndpoints,getDecodedIDToken,revokeAccessToken}from '../src/authenticate'
+import {requestAccessTokenDetails,SignOut,getSignOutURL,userInformation,refreshAccessToken,isAuthenticated,getAccessToken, getOIDCServiceEndpoints,getDecodedIDToken,revokeAccessToken}from '@asgardeo/auth-react-native'
 
 
 const defaultAuthState = {
@@ -16,7 +16,6 @@ const defaultAuthState = {
 const SignIn =({route,navigation}) =>{    
   
   const [authState, setAuthState] = useState(defaultAuthState);
-   
       if (authState.haslogin==false){
 
         Linking.openURL(route.params.url) // Linking the AuthorizeUrl through the internet
@@ -43,7 +42,7 @@ const SignIn =({route,navigation}) =>{
             }).catch((error)=>{
                 console.log(error)
             });
-          
+            
             unmounded = true;
           }
           //const endpoints = await getOIDCServiceEndpoints();
@@ -111,6 +110,7 @@ const SignIn =({route,navigation}) =>{
           {!!authState.accessToken ? (
              
              <Form>
+              
              <FormLabel>accessToken</FormLabel>
                 <FormValue>{authState.accessToken}</FormValue>
              <FormLabel>accessTokenExpirationDate</FormLabel>

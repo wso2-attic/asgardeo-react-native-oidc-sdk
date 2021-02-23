@@ -18,8 +18,8 @@
 
 import "text-encoding-polyfill"
 import React from 'react';
-import {StyleSheet,View,Image, Text,Button} from 'react-native';
-import {initialize,getDataLayer,getAuthorizationURL} from '../src/authenticate'
+import {StyleSheet,View,Image, Text,Button,Linking} from 'react-native';
+import {initialize,getAuthorizationURL} from '@asgardeo/auth-react-native'
 
 
 class LoginScreen extends React.Component {
@@ -63,35 +63,31 @@ class LoginScreen extends React.Component {
     return (
       <View style={styles.mainBody}>
         <View>
+          <View style={styles.container}>
             <View>
-                <Text style={styles.text}>Sample App</Text>
+                <Text style={styles.text}>React Native Authentication Sample</Text>
               </View>
-            <View style={{alignItems: 'center'}}>
+                <View style={{alignItems: 'center'}}>
                 <Image
                   source={require('../assets/login.jpg')}
-                  style={{
-                    width: '60%',
-                    height: '65%',
-                    resizeMode: 'contain',
-                    borderRadius:30
-                    
-                  }}
+                  style={styles.image}
                 />
-                <Text>
-                  Mobile 
-                </Text>
-                <Text>
-                  Authantication With WSO2 IS 
+                <Text style={styles.textpara}>
+                  Sample demo to showcase authentication for a React Native via the OpenID Connect Authorization Code flow, which is integrated using the <Text style={styles.TextStyle} onPress={ ()=> Linking.openURL('https://github.com/asgardeo/asgardeo-react-native-oidc-sdk') } >Asgardeo Auth React Native SDK</Text>.
                 </Text>
               </View>
             
-              <View style={[{width:"30%"},{marginLeft:"35%"},{marginBottom:10}]}>
-              <Button color='#FF5F1F' onPress={this.handleSubmitPress} title="Login"/>
+              <View style={styles.button}>
+              <Button color='#282c34' onPress={this.handleSubmitPress} title="Login"/>
               
+              </View>
               </View>
               <View style={styles.footer}>
               <Text></Text>
-              <Text > {'\u00A9'}  WSO2 @ Asgardeo</Text>
+               <Image
+                  source={require('../assets/footer.png')}
+                  style={{width: 50, height:20,paddingTop:0}}
+                />
               </View>
           </View>
         
@@ -105,19 +101,51 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#0000',
-    borderColor:'orange',
     alignContent: 'center',
-    
+    paddingLeft:20,
+    paddingRight:20,
+
+  },
+  container:{
+    borderColor:"#e2e2e2",
+    borderWidth:2,
+    borderRadius:10
+  },
+  image:{ 
+    width: '85%',
+    height: '60%',
+    resizeMode: 'contain',
+    borderRadius:30
+  },
+  button:{
+    width:"30%",
+    marginLeft:"35%"
   },
   text:{
-    
-    color:'#FF5F1F',
-    fontWeight:'bold' ,
+    backgroundColor:"#f47421",
+    color:'white' ,
     textAlign:'center',
-    fontSize:30,
-    
+    justifyContent:"center",
+    fontSize:25,
+    borderTopRightRadius:10,
+    borderTopLeftRadius:10,
+    borderBottomColor:"#e2e2e2",
+    borderBottomWidth:2
    
     
+  },
+  textpara:{
+
+    textAlign:"center",
+    color:"#2A2A2A",
+    fontSize:17,
+    paddingLeft:20,
+    paddingRight:20,
+    borderBottomColor:"#282c34",
+  },
+  TextStyle:{
+    color:"blue",
+    textDecorationLine:"underline"
   },
   footer:{
     alignItems:'center',

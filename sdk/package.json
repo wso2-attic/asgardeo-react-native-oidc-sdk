@@ -1,21 +1,16 @@
 {
-  "name": "sample",
+  "name": "@asgardeo/auth-react-native",
   "version": "0.0.1",
-  "private": true,
+  "description": "Asgardeo Auth React Native SDK for Mobile Applications.",
+  "main": "index.js",
   "scripts": {
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
-    "start": "react-native start",
-    "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "author": "",
+  "license": "Apache-2.0",
   "dependencies": {
     "@asgardeo/auth-js": "^0.2.0",
-    "@asgardeo/auth-react-native": "file:../asgardeo-auth-react-native-0.0.1.tgz",
     "@react-native-async-storage/async-storage": "^1.13.2",
-    "@react-native-community/masked-view": "^0.1.10",
-    "@react-navigation/native": "^5.9.0",
-    "@react-navigation/stack": "^5.13.0",
     "@types/crypto-js": "^4.0.1",
     "axios": "^0.21.1",
     "crypto-js": "^3.3.0",
@@ -42,20 +37,8 @@
     "@types/react-test-renderer": "^17.0.0",
     "babel-jest": "^25.1.0",
     "eslint": "^6.5.1",
-    "jest": "^25.1.0",
-    "metro-react-native-babel-preset": "^0.59.0",
     "react-test-renderer": "16.13.1",
-    "typescript": "^4.1.2"
-  },
-  "jest": {
-    "preset": "react-native",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
+    "typescript": "^4.1.2",
+    "metro-react-native-babel-preset": "^0.65.1"
   }
 }
