@@ -21,7 +21,6 @@ Repository containing the source of Asgardeo React Native OIDC SDK & Samples.
 - [Develop](#develop)
   - [Prerequisites](#prerequisites)
   - [Installing Dependencies](#installing-dependencies)
-  - [Helpful Links](#helpful-links)
 - [Contribute](#contribute)
   - [Reporting Issues](#reporting-issues)
 - [License](#license)
@@ -31,6 +30,11 @@ Repository containing the source of Asgardeo React Native OIDC SDK & Samples.
 Asgardeo's OIDC SDK for React Native allows Mobile Applications to use OIDC or OAuth2 authentication in a simple and secure way. By using Asgardeo and the React Native OIDC SDK, Mobile application developers will be able to add identity management to their Mobile Applications with more ease.
 
 ## Install
+
+Install the library from the npm registry.
+```
+npm install --save @asgardeo/auth-react-native
+```
 
 ## Getting Started
 
@@ -52,13 +56,19 @@ sections listed below.
     ii. Provide a name for the Service Provider (ex:- sampleRN-app) and click `Register`. Now you will be redirected to the
     `Edit Service Provider` page.<br/>
     iii. Expand the `Inbound Authentication Configuration` section and click `Configure` under the `OAuth/OpenID Connect Configuration` section.<br/>
-    iv. Provide the following values for the respective fields and click `Update` while keeping other default settings as it is.
+    iv. Under Allowed `Grant Types` uncheck everything except `Code` and `Refresh Token`.
+    v. Enter Callback URL(s) like as the following values. 
 
-        Callback Url - http://10.0.2.2:8081
-        Allow authentication without the client secret - True
-
-    v. Click `Update` to save.
-
+        Callback Url - http://{hostname}:{port}
+        
+       ##### Example (If Run Application using emulator)
+       ```TypeScript
+       Callback Url - http://10.0.2.2:8081
+   
+   vi. Check `Allow authentication without the client secret`.
+   
+   vii. Click `Update` to save.
+   
 3.  Once the service provider is saved, you will be redirected to the `Service Provider Details` page. Here, expand the
     `Inbound Authentication Configuration` section and click the `OAuth/OpenID Connect Configuration` section. Copy the
     value of `OAuth Client Key` shown here.
@@ -77,10 +87,10 @@ sections listed below.
 
    ```json
      const Config ={
-      serverOrigin:"https://10.0.2.2:9443",
-      signInRedirectURL:"http://10.0.2.2:8081",
+      serverOrigin:"https://{hostname}:9443",
+      signInRedirectURL:"http://{hostname}:{port}",
       clientID: "ClientID",
-      SignOutURL: "http://10.0.2.2:8081"
+      SignOutURL: "http://{hostname}:{port}" (optional)
     };
    ```
 
@@ -91,7 +101,7 @@ sections listed below.
       serverOrigin:"https://10.0.2.2:9443",
       signInRedirectURL:"http://10.0.2.2:8081",
       clientID: "iMc7TiIaIFafkd5hA5xf7kGiAWUa",
-      SignOutURL: "http://10.0.2.2:8081"
+      SignOutURL: "http://10.0.2.2:8081" (optional)
     };
    ```
 
@@ -102,7 +112,7 @@ sections listed below.
 1. Create a suitable Android Virtual Device by run `react-native run-android` command in project directory terminal.
 
 2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config`
-   file to “10.0.2.2”. Refer the documentation on [emulator-networking](https://reactnative.dev/docs/environment-setup)
+   file to “10.0.2.2”. Refer the documentation on [emulator-networking](https://developer.android.com/studio/run/emulator-networking)
 
 3. By default IS uses a self-signed certificate. If you are using the default pack without
    changing to a CA signed certificate, follow this [guide](https://developer.android.com/training/articles/security-config) to get rid of SSL issues.
@@ -136,8 +146,7 @@ sections listed below.
 1. Enable USB Debugging in the Developer Options in the Android Device. Refer documentation on
    [Run your App](https://reactnative.dev/docs/running-on-device).
 
-2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config` file and the hostnames specified under `hostname` config
-   in the `<IS_HOME>/repository/conf/deployment.toml` file to the IP Address of local machine.
+2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config` file and the hostnames specified under `hostname` config in the `<IS_HOME>/repository/conf/deployment.toml` file to the IP Address of local machine.
    Make sure that both the Android Device and the local machine is connected to the same WIFI network.
 
 3. By default IS uses a self-signed certificate. If you are using the default pack without
@@ -173,6 +182,21 @@ sections listed below.
 ## APIs
 
 The SDK provides some APIs necessary methods to implement an authentication.
+  - [initialize](#initialize)
+  - [getDataLayer](#getdatalayer)
+  - [getAuthorizationURL](#getauthorizationurl)
+  - [requestAccessTokenDetails](#requestaccesstokendetails)
+  - [getSignOutUrl](#getsignouturl)
+  - [SignOut](#signout)
+  - [getOIDCServiceEndpoints](#getoidcserviceendpoints)
+  - [getDecodedIDToken](#getdecodedidtoken)
+  - [userInformation](#userinformation)
+  - [revokeAccessToken](#revokeaccesstoken)
+  - [refreshAccessToken](#refreshaccesstoken)
+  - [getAccessToken](#getaccesstoken)
+  - [isAuthenticated](#isauthenticated)
+  - [getPKCECode](#getpkcecode)
+  - [setPKCECode](#setpkcecode)
 
 ### initialize
 
@@ -254,16 +278,13 @@ getAuthorizationURL(Config).then((url) => {
 ### requestAccessTokenDetails
 
 ```TypeScript
-requestAccessTokenDetails = (AuthUrl,config)
+requestAccessTokenDetails = (AuthUrl)
 ```
 
 #### Arguments
 
 1. AuthUrl
    This is a url. After the user signs in with using Identity server can get this url. It contains sessionState and authorizationCode these are obtained from identity server.
-2. config:
-   This config contains the ClientID, server Origin, SigINRedirectURL, SighOutRedirectUrl,and etc. This information needed to umplement the authentication.
-
 #### Description
 
 This method uses the authorization code and session state to send a request to the token endpoint to obtain the acess token and the id token. The sign-in functionality can be implemented by calling the getAuthorizationURL method followed by this method.
@@ -271,7 +292,7 @@ This method uses the authorization code and session state to send a request to t
 #### Example
 
 ```TypeScript
-requestAccessTokenDetails(AuthUrl,Config).then((token)=>{
+requestAccessTokenDetails(AuthUrl).then((token)=>{
     console.log(token)
 }).catch((error)=>{
     console.log(error)
@@ -383,7 +404,7 @@ const UserInfo =  await userInformation();
 ### revokeAccessToken
 
 ```TypeScript
-revokeAccessToken= async(config)
+revokeAccessToken= async()
 ```
 
 #### Description
@@ -405,7 +426,7 @@ revokeAccessToken().then((response)=>{
 ### refreshAccessToken
 
 ```TypeScript
- refreshAccessToken = async (config): Promise<TokenResponse>
+ refreshAccessToken = async (): Promise<TokenResponse>
 ```
 
 #### Description
@@ -415,7 +436,7 @@ This method sends a refresh-token request and returns a promise that resolves wi
 #### Example
 
 ```TypeScript
-refreshAccessToken(Config).then((response)=>{
+refreshAccessToken().then((response)=>{
     console.log(response);
 }).catch((error)=>{
     console.error(error);
@@ -494,7 +515,7 @@ The PKCE code generated by the [`getAuthorizationURL`](#getAuthorizationURL) met
 
 #### Description
 
-This method sets the PKCE code to the store. The PKCE code is usually stored in the store by the SDK. But there could be instances when the store could be cleared such as when the data is stored in the memory and the user is redirected to the authorization endpoint in a Single Page Application. When the user is redirected back to the app, the authorization code, session state, and the PKCE code will have to be sent to the server to obtain the access token. However, since, during redirection, everything in the memory is cleared, the PKCE code cannot be obtained. In such instances, the [`getPKCECode`](#getPKCECode) method can be used to get the PKCE code before redirection and store it in a place from where it can be retrieved after redirection, and then this method can be used to save the PKCE code to the store so that the [`requestAccessToken`](#requestAccessToken) method can run successfully.
+This method sets the PKCE code to the store.
 
 #### Example
 
@@ -505,20 +526,8 @@ setPKCECode("pkce");
 ---
 
 ## Develop
-
 ### Prerequisites
-
-[React Native Environment setup](https://reactnative.dev/docs/environment-setup)
-
-Android development environment
-
-### Installing Dependencies
-
-### Helpful Links
-
-[React Native Doc](https://reactnative.dev/docs/environment-setup)
-[WSO2 Identity Server Doc](https://is.docs.wso2.com/en/latest/)
-[SSL issue handling Doc](https://is.docs.wso2.com/en/5.9.0/setup/changing-the-hostname/)
+-    [React Native Environment setup](https://reactnative.dev/docs/environment-setup)
 
 ## Contribute
 
