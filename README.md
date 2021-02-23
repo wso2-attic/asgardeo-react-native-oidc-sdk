@@ -31,6 +31,11 @@ Asgardeo's OIDC SDK for React Native allows Mobile Applications to use OIDC or O
 
 ## Install
 
+Install the library from the npm registry.
+```
+npm install --save @asgardeo/auth-react-native
+```
+
 ## Getting Started
 
 You can experience the capabilities of Asgardeo React-native OIDC SDK by following this small guide which contains main
@@ -51,13 +56,19 @@ sections listed below.
     ii. Provide a name for the Service Provider (ex:- sampleRN-app) and click `Register`. Now you will be redirected to the
     `Edit Service Provider` page.<br/>
     iii. Expand the `Inbound Authentication Configuration` section and click `Configure` under the `OAuth/OpenID Connect Configuration` section.<br/>
-    iv. Provide the following values for the respective fields and click `Update` while keeping other default settings as it is.
+    iv. Under Allowed `Grant Types` uncheck everything except `Code` and `Refresh Token`.
+    v. Enter Callback URL(s) like as the following values. 
 
-        Callback Url - http://10.0.2.2:8081
-        Allow authentication without the client secret - True
-
-    v. Click `Update` to save.
-
+        Callback Url - http://{hostname}:{port}
+        
+       ##### Example (If Run Application using emulator)
+       ```TypeScript
+       Callback Url - http://10.0.2.2:8081
+   
+   vi. Check `Allow authentication without the client secret`.
+   
+   vii. Click `Update` to save.
+   
 3.  Once the service provider is saved, you will be redirected to the `Service Provider Details` page. Here, expand the
     `Inbound Authentication Configuration` section and click the `OAuth/OpenID Connect Configuration` section. Copy the
     value of `OAuth Client Key` shown here.
@@ -76,10 +87,10 @@ sections listed below.
 
    ```json
      const Config ={
-      serverOrigin:"https://10.0.2.2:9443",
-      signInRedirectURL:"http://10.0.2.2:8081",
+      serverOrigin:"https://{hostname}:9443",
+      signInRedirectURL:"http://{hostname}:{port}",
       clientID: "ClientID",
-      SignOutURL: "http://10.0.2.2:8081"
+      SignOutURL: "http://{hostname}:{port}" (optional)
     };
    ```
 
@@ -90,7 +101,7 @@ sections listed below.
       serverOrigin:"https://10.0.2.2:9443",
       signInRedirectURL:"http://10.0.2.2:8081",
       clientID: "iMc7TiIaIFafkd5hA5xf7kGiAWUa",
-      SignOutURL: "http://10.0.2.2:8081"
+      SignOutURL: "http://10.0.2.2:8081" (optional)
     };
    ```
 
@@ -101,7 +112,7 @@ sections listed below.
 1. Create a suitable Android Virtual Device by run `react-native run-android` command in project directory terminal.
 
 2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config`
-   file to “10.0.2.2”. Refer the documentation on [emulator-networking](https://reactnative.dev/docs/environment-setup)
+   file to “10.0.2.2”. Refer the documentation on [emulator-networking](https://developer.android.com/studio/run/emulator-networking)
 
 3. By default IS uses a self-signed certificate. If you are using the default pack without
    changing to a CA signed certificate, follow this [guide](https://developer.android.com/training/articles/security-config) to get rid of SSL issues.
@@ -135,8 +146,7 @@ sections listed below.
 1. Enable USB Debugging in the Developer Options in the Android Device. Refer documentation on
    [Run your App](https://reactnative.dev/docs/running-on-device).
 
-2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config` file and the hostnames specified under `hostname` config
-   in the `<IS_HOME>/repository/conf/deployment.toml` file to the IP Address of local machine.
+2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config` file and the hostnames specified under `hostname` config in the `<IS_HOME>/repository/conf/deployment.toml` file to the IP Address of local machine.
    Make sure that both the Android Device and the local machine is connected to the same WIFI network.
 
 3. By default IS uses a self-signed certificate. If you are using the default pack without
@@ -172,6 +182,21 @@ sections listed below.
 ## APIs
 
 The SDK provides some APIs necessary methods to implement an authentication.
+  - [initialize](#initialize)
+  - [getDataLayer](#getdatalayer)
+  - [getAuthorizationURL](#getauthorizationurl)
+  - [requestAccessTokenDetails](#requestaccesstokendetails)
+  - [getSignOutUrl](#getsignouturl)
+  - [SignOut](#signout)
+  - [getOIDCServiceEndpoints](#getoidcserviceendpoints)
+  - [getDecodedIDToken](#getdecodedidtoken)
+  - [userInformation](#userinformation)
+  - [revokeAccessToken](#revokeaccesstoken)
+  - [refreshAccessToken](#refreshaccesstoken)
+  - [getAccessToken](#getaccesstoken)
+  - [isAuthenticated](#isauthenticated)
+  - [getPKCECode](#getpkcecode)
+  - [setPKCECode](#setpkcecode)
 
 ### initialize
 
@@ -501,10 +526,8 @@ setPKCECode("pkce");
 ---
 
 ## Develop
-
 ### Prerequisites
-
-### Installing Dependencies
+-    [React Native Environment setup](https://reactnative.dev/docs/environment-setup)
 
 ## Contribute
 
