@@ -272,6 +272,7 @@ export class AuthenticationHelper<T> {
                 scope: data.scope,
                 tokenType: data.token_type
             };
+            
             await auth.getDataLayer().setSessionData(data)
             //await auth.getDataLayer().setSessionData((data))
             return Promise.resolve(tokenResponse);

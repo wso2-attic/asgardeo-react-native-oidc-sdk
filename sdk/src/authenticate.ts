@@ -108,10 +108,9 @@ import url from 'url';
 
     }
 
-    export const requestAccessToken = async(authorizationCode, sessionState): Promise<TokenResponse>=>{
+     const requestAccessToken = async(authorizationCode, sessionState): Promise<TokenResponse>=>{
         
         const data = auth.getDataLayer();
-        console.log()
         const  _authenticationHelper = new AuthenticationHelper(data);
         const tokenEndpoint = (await data.getOIDCProviderMetaData()).token_endpoint;
         const configData = await auth.getDataLayer().getConfigData();
