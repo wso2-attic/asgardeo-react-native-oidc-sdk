@@ -15,10 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import "text-encoding-polyfill"
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {AsgardeoAuthClient} from '@asgardeo/auth-js';
-
+import { AsgardeoAuthClient } from '@asgardeo/auth-js';
 
 // Create a Store class to store the authentication data. The following implementation uses the async-storage.
 class LocalStorage {
@@ -31,32 +31,31 @@ class LocalStorage {
    
   // save the data into the store
   async setData(key:string,value:string){
-      try{
+    try{
       await AsyncStorage.setItem(key, value);
     }
-      catch(error){
-          console.log(error)
+    catch(error){
+      console.log(error)
     
-      }
+    }
   }
 
   // remove the data from the store.
-   async removeData(key:string){
-      try{
+  async removeData(key:string){
+    try{
       await AsyncStorage.removeItem(key)
-      }
-      catch(error){
-          console.log(error)
-      }
+    }
+    catch(error){
+      console.log(error)
+    }
   }
 
 }
-
 
 // Instantiate the LocalStore class
 const store = new LocalStorage();
 
 // Instantiate the AsgardeoAuthClient and pass the store object as an argument into the constructor of the asgardeo-auth-js sdk.
-export const auth =new AsgardeoAuthClient(store);
+export const auth = new AsgardeoAuthClient(store);
 
 

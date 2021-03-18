@@ -17,11 +17,28 @@
  */
 
 import { KeyLike } from "crypto";
-import {fetch} from 'react-native-ssl-pinning';
-import { SERVICE_RESOURCES} from "./oidc-endpoints";
-import { AsgardeoAuthException, AsgardeoAuthNetworkException } from "./exception";
-import { DataLayer,AuthClientConfig, OIDCProviderMetaData, TokenResponse,OIDC_SCOPE,TOKEN_TAG,USERNAME_TAG,SCOPE_TAG,CLIENT_ID_TAG,CLIENT_SECRET_TAG } from "@asgardeo/auth-js";
-import { AuthenticationUtils, CryptoUtils } from "./utils";
+import { fetch } from 'react-native-ssl-pinning';
+import { SERVICE_RESOURCES } from "./oidc-endpoints";
+import { 
+    AsgardeoAuthException,
+    AsgardeoAuthNetworkException,
+} from "./exception";
+import { 
+    DataLayer,
+    AuthClientConfig,
+    OIDCProviderMetaData,
+    TokenResponse,
+    OIDC_SCOPE,
+    TOKEN_TAG,
+    USERNAME_TAG,
+    SCOPE_TAG,
+    CLIENT_ID_TAG,
+    CLIENT_SECRET_TAG,
+} from "@asgardeo/auth-js";
+import { 
+    AuthenticationUtils,
+    CryptoUtils,
+} from "./utils";
 import { auth } from "./store";
 
 export class AuthenticationHelper<T> {
@@ -112,18 +129,16 @@ export class AuthenticationHelper<T> {
                 }
 
                 const issuer = (await this._oidcProviderMetaData()).issuer;
-                
                 const issuerFromURL = (await this.resolveWellKnownEndpoint()).split("/.well-known")[0];
                 
                 // Return false if the issuer in the open id config doesn't match
                 // the issuer in the well known endpoint URL.
-                if (!issuer || issuer == issuerFromURL) {
-                    
+                if (!issuer || issuer == issuerFromURL) { 
                     return Promise.resolve(false);
                 }
                 
                 const data =JSON.parse(response.bodyString);
-                
+
                 return CryptoUtils.getJWKForTheIdToken(idToken.split(".")[0], data.keys)
                     .then(async (jwk: KeyLike) => {
                         return CryptoUtils.isValidIdToken(
@@ -262,7 +277,6 @@ export class AuthenticationHelper<T> {
                     );
                 });
         } else {
-            
             const data =JSON.parse(response.bodyString);
             const tokenResponse: TokenResponse = {
                 accessToken: data.access_token,
@@ -272,9 +286,7 @@ export class AuthenticationHelper<T> {
                 scope: data.scope,
                 tokenType: data.token_type
             };
-            
             await auth.getDataLayer().setSessionData(data)
-            //await auth.getDataLayer().setSessionData((data))
             return Promise.resolve(tokenResponse);
         }
     }

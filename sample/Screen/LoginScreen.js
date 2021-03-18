@@ -15,192 +15,205 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import "text-encoding-polyfill"
+import 'text-encoding-polyfill';
+import {
+  initialize,
+  getAuthorizationURL,
+  requestAccessTokenDetails,
+  userInformation,
+  getDecodedIDToken,
+} from '@asgardeo/auth-react-native';
 import React from 'react';
-import {StyleSheet,View,Image, Text,Button,Linking} from 'react-native';
-import {initialize,getAuthorizationURL,requestAccessTokenDetails,userInformation, getDecodedIDToken} from '@asgardeo/auth-react-native'
+import {StyleSheet, View, Image, Text, Button, Linking} from 'react-native';
 
-  // Create a config object containing the necessary configurations.
-  
-    //for emulator
-    const Config ={
-      serverOrigin:"https://10.0.2.2:9443",
-      signInRedirectURL:"http://10.0.2.2:8081",
-      clientID: "iMc7TiIaIFafkd5hA5xf7kGiAWUa",
-      //SignOutURL: "http://10.0.2.2:8081"
-    };
+// Create a config object containing the necessary configurations.
+//for emulator
+const Config = {
+  serverOrigin: 'https://10.0.2.2:9443',
+  signInRedirectURL: 'http://10.0.2.2:8081',
+  clientID: 'iMc7TiIaIFafkd5hA5xf7kGiAWUa',
+  //SignOutURL: "http://10.0.2.2:8081"       (Optional)
+};
 
-   // for device
-    //  const Config ={
-    //    serverOrigin:"https://192.168.43.29:9443",
-    //    signInRedirectURL:"http://192.168.43.29:8081",
-    //    clientID: "M1eM7_pf45m0fKJkfCDUTI6Demca",
-    //    SignOutURL: "http://192.168.43.29:8081"
-    //  };
-
-
+// for device
+//  const Config ={
+//    serverOrigin:"https://192.168.43.29:9443",
+//    signInRedirectURL:"http://192.168.43.29:8081",
+//    clientID: "M1eM7_pf45m0fKJkfCDUTI6Demca",
+//    SignOutURL: "http://192.168.43.29:8081"
+//  };
 
 class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       refreshToken: '',
-      idToken:"",
-      haslogin:false,
-      allowedScopes:"",
-      username:"",
-      sessionState:"",
-      amr:"",
-      at_hash: "",
-      aud: "", 
-      azp: "",
-      c_hash: "", 
-      exp: "", 
-      iat:"" ,
-      iss: "", 
-      nbf: "", 
-      sub: ""
+      idToken: '',
+      haslogin: false,
+      allowedScopes: '',
+      username: '',
+      sessionState: '',
+      amr: '',
+      at_hash: '',
+      aud: '',
+      azp: '',
+      c_hash: '',
+      exp: '',
+      iat: '',
+      iss: '',
+      nbf: '',
+      sub: '',
     };
   }
-  componentDidMount(){
-    Linking.addEventListener("url", this.handleAuthUrl); 
 
+  componentDidMount() {
+    Linking.addEventListener('url', this.handleAuthUrl);
   }
-  handleAuthUrl= async (Url)=>{
 
-      requestAccessTokenDetails(Url).then((token )=>{ // get param of authorization url and return token details
-        this.setState({...token,haslogin:true}) 
-      }).catch((error)=>{
-          console.log(error)
+  handleAuthUrl = async (Url) => {
+    requestAccessTokenDetails(Url)
+      .then((token) => {
+        // get param of authorization url and return token details
+        this.setState({...token, haslogin: true});
+      })
+      .catch((error) => {
+        console.log(error);
       });
-
-    
-  }
+  };
 
   handleSubmitPress = async () => {
-
-
     // initializes the SDK with the config data
-    await initialize(Config) 
-
+    await initialize(Config);
 
     // authenticate with Identity server
-    getAuthorizationURL(Config).then((url) => {
-      if(this.state.haslogin==false){
-        Linking.openURL(url) // Linking the AuthorizeUrl through the internet
-      }else{
-        userInformation().then(user=>{
-          this.setState({...user})
-          
-          getDecodedIDToken().then(decodeID=>{
-            this.setState({...decodeID})
-            this.props.navigation.navigate("SignIn",{token:this.state}) 
-            this.setState({haslogin:false})
-          })
-        })
-      
-      }
-    })
-    .catch((error) => {
-        console.error(error);
-    });
+    getAuthorizationURL(Config)
+      .then((url) => {
+        if (this.state.haslogin === false) {
+          Linking.openURL(url); // Linking the AuthorizeUrl through the internet
+        } else {
+          userInformation().then((user) => {
+            this.setState({...user});
 
-    }
-  
-    render(){
-      return (
-        <View style={styles.mainBody}>
-          <View>
-            <View style={styles.container}>
-              <View>
-                  <Text style={styles.text}>React Native Authentication Sample</Text>
-                </View>
-                  <View style={{alignItems: 'center'}}>
-                  <Image
-                    source={require('../assets/login.jpg')}
-                    style={styles.image}
-                  />
-                  <Text style={styles.textpara}>
-                    Sample demo to showcase authentication for a React Native via the OpenID Connect Authorization Code flow, which is integrated using the <Text style={styles.TextStyle} onPress={ ()=> Linking.openURL('https://github.com/asgardeo/asgardeo-react-native-oidc-sdk') } >Asgardeo Auth React Native SDK</Text>.
-                  </Text>
-                </View>
-              
-                <View style={styles.button}>
-                <Button color='#282c34' onPress={this.handleSubmitPress} title="Login"/>
-                
-                </View>
-                </View>
-                <View style={styles.footer}>
-                <Text></Text>
-                 <Image
-                    source={require('../assets/footer.png')}
-                    style={{width: 50, height:20,paddingTop:0}}
-                  />
-                </View>
+            getDecodedIDToken().then((decodeID) => {
+              this.setState({...decodeID});
+              this.props.navigation.navigate('SignIn', {token: this.state});
+              this.setState({haslogin: false});
+            });
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  render() {
+    return (
+      <View style={styles.mainBody}>
+        <View>
+          <View style={styles.container}>
+            <View>
+              <Text style={styles.text}>
+                React Native Authentication Sample{' '}
+              </Text>
             </View>
-          
+            <View style={styles.imageAlign}>
+              <Image
+                source={require('../assets/login.jpg')}
+                style={styles.image}
+              />
+              <Text style={styles.textpara}>
+                Sample demo to showcase authentication for a React Native via
+                the OpenID Connect Authorization Code flow, which is integrated
+                using the{' '}
+                <Text
+                  style={styles.TextStyle}
+                  onPress={() =>
+                    Linking.openURL(
+                      'https://github.com/asgardeo/asgardeo-react-native-oidc-sdk',
+                    )
+                  }>
+                  Asgardeo Auth React Native SDK
+                </Text>
+                .
+              </Text>
+            </View>
+            <View style={styles.button}>
+              <Button
+                color="#282c34"
+                onPress={this.handleSubmitPress}
+                title="Login"
+              />
+            </View>
+          </View>
+
+          <View style={styles.footer}>
+            <Image
+              source={require('../assets/footer.png')}
+              style={styles.footerAlign}
+            />
+          </View>
         </View>
-      );
-  };}
-  export default LoginScreen;
-  
-  const styles = StyleSheet.create({
-    mainBody: {
-      flex: 1,
-      justifyContent: 'center',
-      backgroundColor: '#0000',
-      alignContent: 'center',
-      paddingLeft:20,
-      paddingRight:20,
-  
-    },
-    container:{
-      borderColor:"#e2e2e2",
-      borderWidth:2,
-      borderRadius:10
-    },
-    image:{ 
-      width: '85%',
-      height: '60%',
-      resizeMode: 'contain',
-      borderRadius:30
-    },
-    button:{
-      width:"30%",
-      marginLeft:"35%"
-    },
-    text:{
-      backgroundColor:"#f47421",
-      color:'white' ,
-      textAlign:'center',
-      justifyContent:"center",
-      fontSize:25,
-      borderTopRightRadius:10,
-      borderTopLeftRadius:10,
-      borderBottomColor:"#e2e2e2",
-      borderBottomWidth:2
-     
-      
-    },
-    textpara:{
-  
-      textAlign:"center",
-      color:"#2A2A2A",
-      fontSize:17,
-      paddingLeft:20,
-      paddingRight:20,
-      borderBottomColor:"#282c34",
-    },
-    TextStyle:{
-      color:"blue",
-      textDecorationLine:"underline"
-    },
-    footer:{
-      alignItems:'center',
-      
-      
-    }
-  
-  
-  });
+      </View>
+    );
+  }
+}
+
+export default LoginScreen;
+
+const styles = StyleSheet.create({
+  mainBody: {
+    backgroundColor: '#0000',
+  },
+
+  imageAlign: {
+    alignItems: 'center',
+  },
+
+  image: {
+    width: '85%',
+    height: '60%',
+    resizeMode: 'contain',
+    borderRadius: 30,
+  },
+
+  button: {
+    width: '30%',
+    marginLeft: '35%',
+  },
+
+  text: {
+    backgroundColor: '#f47421',
+    color: 'white',
+    textAlign: 'center',
+    justifyContent: 'center',
+    fontSize: 30,
+    borderBottomColor: '#e2e2e2',
+    borderBottomWidth: 2,
+  },
+
+  textpara: {
+    justifyContent: 'center',
+    textAlign: 'justify',
+    color: '#2A2A2A',
+    fontSize: 18,
+    paddingLeft: 20,
+    paddingRight: 20,
+    borderBottomColor: '#282c34',
+  },
+
+  TextStyle: {
+    color: 'blue',
+    textDecorationLine: 'underline',
+  },
+
+  footer: {
+    alignItems: 'center',
+    paddingTop: 45,
+  },
+
+  footerAlign: {
+    width: 50,
+    height: 20,
+  },
+});
