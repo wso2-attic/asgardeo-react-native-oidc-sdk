@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -137,7 +137,7 @@ export class AuthenticationHelper<T> {
                     return Promise.resolve(false);
                 }
                 
-                const data =JSON.parse(response.bodyString);
+                const data = JSON.parse(response.bodyString);
 
                 return CryptoUtils.getJWKForTheIdToken(idToken.split(".")[0], data.keys)
                     .then(async (jwk: KeyLike) => {
@@ -237,7 +237,7 @@ export class AuthenticationHelper<T> {
         }
         
         if ((await this._config()).validateIDToken) {
-            const data =JSON.parse(response.bodyString);
+            const data = JSON.parse(response.bodyString);
             return this.validateIdToken(data.id_token)
                 .then(async (valid) => {
                     if (valid) {
@@ -277,7 +277,7 @@ export class AuthenticationHelper<T> {
                     );
                 });
         } else {
-            const data =JSON.parse(response.bodyString);
+            const data = JSON.parse(response.bodyString);
             const tokenResponse: TokenResponse = {
                 accessToken: data.access_token,
                 expiresIn: data.expires_in,
