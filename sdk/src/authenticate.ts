@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -47,7 +47,6 @@ import url from 'url';
  *
  * initialize(config);
  */
-
 export const initialize = async(config):Promise<void> => {
     await auth.initialize(config);
 }
@@ -113,7 +112,6 @@ export const requestAccessTokenDetails = (Authurl) => {
     const code = data_list[0].split('=')[1]
     const session_state = data_list[1].split('=')[1]
     return requestAccessToken(code,session_state)
-
 }
 
 const requestAccessToken = async (authorizationCode, sessionState) : Promise<TokenResponse> => {
@@ -545,4 +543,3 @@ export const getPKCECode = async () => {
 export const setPKCECode = async (pkce:string) => {
     return await auth.setPKCECode(pkce)
 }
-
