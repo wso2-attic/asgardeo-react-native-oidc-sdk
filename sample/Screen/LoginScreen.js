@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import 'text-encoding-polyfill';
 import {
   initialize,
@@ -24,7 +25,8 @@ import {
   getDecodedIDToken,
 } from '@asgardeo/auth-react-native';
 import React from 'react';
-import {StyleSheet, View, Image, Text, Button, Linking} from 'react-native';
+import { View, Image, Text, Button, Linking } from 'react-native';
+import { styles } from '../components/styles';
 
 // Create a config object containing the necessary configurations.
 //for emulator
@@ -74,7 +76,7 @@ class LoginScreen extends React.Component {
     requestAccessTokenDetails(Url)
       .then((token) => {
         // get param of authorization url and return token details
-        this.setState({...token, haslogin: true});
+        this.setState({ ...token, haslogin: true });
       })
       .catch((error) => {
         console.log(error);
@@ -92,12 +94,12 @@ class LoginScreen extends React.Component {
           Linking.openURL(url); // Linking the AuthorizeUrl through the internet
         } else {
           userInformation().then((user) => {
-            this.setState({...user});
+            this.setState({ ...user });
 
             getDecodedIDToken().then((decodeID) => {
-              this.setState({...decodeID});
-              this.props.navigation.navigate('SignIn', {token: this.state});
-              this.setState({haslogin: false});
+              this.setState({ ...decodeID });
+              this.props.navigation.navigate('SignIn', { token: this.state });
+              this.setState({ haslogin: false });
             });
           });
         }
@@ -109,48 +111,46 @@ class LoginScreen extends React.Component {
 
   render() {
     return (
-      <View style={styles.mainBody}>
+      <View style = { styles.mainBody }>
         <View>
-          <View style={styles.container}>
+          <View style = { styles.container }>
             <View>
-              <Text style={styles.text}>
+              <Text style = { styles.text }>
                 React Native Authentication Sample{' '}
               </Text>
             </View>
-            <View style={styles.imageAlign}>
+            <View style = { styles.imageAlign }>
               <Image
-                source={require('../assets/login.jpg')}
-                style={styles.image}
+                source = { require('../assets/login.jpg') }
+                style = { styles.image }
               />
-              <Text style={styles.textpara}>
+              <Text style = { styles.textpara }>
                 Sample demo to showcase authentication for a React Native via
                 the OpenID Connect Authorization Code flow, which is integrated
                 using the{' '}
                 <Text
-                  style={styles.TextStyle}
-                  onPress={() =>
-                    Linking.openURL(
-                      'https://github.com/asgardeo/asgardeo-react-native-oidc-sdk',
-                    )
+                  style = { styles.TextStyle }
+                  onPress = { () =>
+                    Linking.openURL('https://github.com/asgardeo/asgardeo-react-native-oidc-sdk')
                   }>
                   Asgardeo Auth React Native SDK
                 </Text>
                 .
               </Text>
             </View>
-            <View style={styles.button}>
+            <View style = { styles.button }>
               <Button
-                color="#282c34"
-                onPress={this.handleSubmitPress}
-                title="Login"
+                color = "#282c34"
+                onPress = { this.handleSubmitPress }
+                title = "Login"
               />
             </View>
           </View>
 
-          <View style={styles.footer}>
+          <View style = { styles.footer }>
             <Image
-              source={require('../assets/footer.png')}
-              style={styles.footerAlign}
+              source = { require('../assets/footer.png') }
+              style = { styles.footerAlign }
             />
           </View>
         </View>
@@ -160,60 +160,3 @@ class LoginScreen extends React.Component {
 }
 
 export default LoginScreen;
-
-const styles = StyleSheet.create({
-  mainBody: {
-    backgroundColor: '#0000',
-  },
-
-  imageAlign: {
-    alignItems: 'center',
-  },
-
-  image: {
-    width: '85%',
-    height: '60%',
-    resizeMode: 'contain',
-    borderRadius: 30,
-  },
-
-  button: {
-    width: '30%',
-    marginLeft: '35%',
-  },
-
-  text: {
-    backgroundColor: '#f47421',
-    color: 'white',
-    textAlign: 'center',
-    justifyContent: 'center',
-    fontSize: 30,
-    borderBottomColor: '#e2e2e2',
-    borderBottomWidth: 2,
-  },
-
-  textpara: {
-    justifyContent: 'center',
-    textAlign: 'justify',
-    color: '#2A2A2A',
-    fontSize: 18,
-    paddingLeft: 20,
-    paddingRight: 20,
-    borderBottomColor: '#282c34',
-  },
-
-  TextStyle: {
-    color: 'blue',
-    textDecorationLine: 'underline',
-  },
-
-  footer: {
-    alignItems: 'center',
-    paddingTop: 45,
-  },
-
-  footerAlign: {
-    width: 50,
-    height: 20,
-  },
-});
