@@ -404,7 +404,7 @@ const UserInfo =  await userInformation();
 ### revokeAccessToken
 
 ```TypeScript
-revokeAccessToken = async()
+revokeAccessToken = async ()
 ```
 
 #### Description
