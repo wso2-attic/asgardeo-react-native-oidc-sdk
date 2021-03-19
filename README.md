@@ -85,7 +85,7 @@ sections listed below.
    - Replace the value of `client-id` with the value of `OAuth Client Key` property which you copied in the step 3 when
      [configuring the Identity Server](#configuring-the-identity-server).
 
-   ```json
+   ```TypeScript
     const Config = {
       serverOrigin: 'https://{hostname}:9443',
       signInRedirectURL: 'http://{hostname}:{port}',
@@ -96,7 +96,7 @@ sections listed below.
 
    Example:
 
-   ```json
+   ```TypeScript
     const Config = {
       serverOrigin: 'https://10.0.2.2:9443',
       signInRedirectURL: 'http://10.0.2.2:8081',
