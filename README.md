@@ -86,22 +86,22 @@ sections listed below.
      [configuring the Identity Server](#configuring-the-identity-server).
 
    ```json
-     const Config ={
-      serverOrigin:"https://{hostname}:9443",
-      signInRedirectURL:"http://{hostname}:{port}",
-      clientID: "ClientID",
-      SignOutURL: "http://{hostname}:{port}" (optional)
+    const Config = {
+      serverOrigin: 'https://{hostname}:9443',
+      signInRedirectURL: 'http://{hostname}:{port}',
+      clientID: 'ClientID',
+      SignOutURL: "http://{hostname}:{port}"       (Optional)
     };
    ```
 
    Example:
 
    ```json
-    const Config ={
-      serverOrigin:"https://10.0.2.2:9443",
-      signInRedirectURL:"http://10.0.2.2:8081",
-      clientID: "iMc7TiIaIFafkd5hA5xf7kGiAWUa",
-      SignOutURL: "http://10.0.2.2:8081" (optional)
+    const Config = {
+      serverOrigin: 'https://10.0.2.2:9443',
+      signInRedirectURL: 'http://10.0.2.2:8081',
+      clientID: 'iMc7TiIaIFafkd5hA5xf7kGiAWUa',
+      SignOutURL: "http://10.0.2.2:8081"       (Optional)
     };
    ```
 
@@ -124,7 +124,7 @@ sections listed below.
    keytool -genkey -alias wso2carbon -keyalg RSA -keystore wso2carbon.jks -keysize 2048 -ext SAN=IP:10.0.2.2
    ```
 
-   ii. Export the public certificate (name it as wso2carbon.pem)to add into the truststore.
+   ii. Export the public certificate ( name it as wso2carbon.pem ) to add into the truststore.
 
    ```
    keytool -exportcert -alias wso2carbon -keystore wso2carbon.jks -rfc -file wso2carbon.pem
@@ -136,7 +136,7 @@ sections listed below.
    keytool -import -alias wso2is -file wso2carbon.pem -keystore client-truststore.jks -storepass wso2carbon
    ```
 
-   iv. Now copy this public certificate (wso2carbon.pem) into the `app/src/main/res/raw` folder.
+   iv. Now copy this public certificate ( wso2carbon.pem ) into the `app/src/main/res/raw` folder.
 
 5. Select the Virtual Device to run the application.
 6. Run the the module `sample` on the selected Virtual Device.
@@ -159,7 +159,7 @@ sections listed below.
    keytool -genkey -alias wso2carbon -keyalg RSA -keystore wso2carbon.jks -keysize 2048 -ext SAN=IP:IP Address
    ```
 
-   ii. Export the public certificate (name it as wso2carbon.pem)to add into the truststore.
+   ii. Export the public certificate ( name it as wso2carbon.pem ) to add into the truststore.
 
    ```
    keytool -exportcert -alias wso2carbon -keystore wso2carbon.jks -rfc -file wso2carbon.pem
@@ -171,7 +171,7 @@ sections listed below.
    keytool -import -alias wso2is -file wso2carbon.pem -keystore client-truststore.jks -storepass wso2carbon
    ```
 
-   iv. Now copy this public certificate (wso2carbon.pem) into the `app/src/main/res/raw` folder.
+   iv. Now copy this public certificate ( wso2carbon.pem ) into the `app/src/main/res/raw` folder.
 
 5. Connect the Android Device to the machine through a USB cable.
 
@@ -201,7 +201,7 @@ The SDK provides some APIs necessary methods to implement an authentication.
 ### initialize
 
 ```TypeScript
-initialize=async(config):Promise<void> ;
+initialize = async (config):Promise<void> ;
 ```
 
 #### Arguments
@@ -216,12 +216,12 @@ This method initializes the config data instance.
 #### Example
 
 ```TypeScript
-const Config ={
-      serverOrigin:"https://10.0.2.2:9443",
-      signInRedirectURL:"http://10.0.2.2:8081",
-      clientID: "Client ID",
-      SignOutURL: "http://10.0.2.2:8081/Login"
-    };
+const Config = {
+  serverOrigin: 'https://10.0.2.2:9443',
+  signInRedirectURL: 'http://10.0.2.2:8081',
+  clientID: 'iMc7TiIaIFafkd5hA5xf7kGiAWUa',
+  SignOutURL: "http://10.0.2.2:8081"       (Optional)
+};
 
 
 await initialize(Config)
@@ -232,7 +232,7 @@ await initialize(Config)
 ### getDataLayer
 
 ```TypeScript
-getDataLayer= async ()
+getDataLayer = async ()
 ```
 
 #### Description
@@ -250,7 +250,7 @@ const _dataLayer = await getDataLayer();
 ### getAuthorizationURL
 
 ```TypeScript
-getAuthorizationURL= async(config): Promise<String>
+getAuthorizationURL = async (config): Promise<String>
 ```
 
 #### Arguments
@@ -292,9 +292,9 @@ This method uses the authorization code and session state to send a request to t
 #### Example
 
 ```TypeScript
-requestAccessTokenDetails(AuthUrl).then((token)=>{
+requestAccessTokenDetails(AuthUrl).then((token) => {
     console.log(token)
-}).catch((error)=>{
+}).catch((error) => {
     console.log(error)
 });
 ```
@@ -324,7 +324,7 @@ Linking.openURL(signOutUrl)
 ### SignOut
 
 ```
-SignOut= (Url)
+SignOut = (Url)
 ```
 
 #### Arugument
@@ -347,7 +347,7 @@ _signOut = SignOut(Url)
 ### getOIDCServiceEndpoints
 
 ```TypeScript
-getOIDCServiceEndpoints= async()
+getOIDCServiceEndpoints = async()
 ```
 
 #### Description
@@ -366,7 +366,7 @@ const endpoints = await getOIDCServiceEndpoints();
 ### getDecodedIDToken
 
 ```TypeScript
-getDecodedIDToken = async()
+getDecodedIDToken = async ()
 ```
 
 #### Description
@@ -404,7 +404,7 @@ const UserInfo =  await userInformation();
 ### revokeAccessToken
 
 ```TypeScript
-revokeAccessToken= async()
+revokeAccessToken = async()
 ```
 
 #### Description
@@ -414,9 +414,9 @@ This method clears the authentication data and sends a request to revoke the acc
 #### Example
 
 ```TypeScript
-revokeAccessToken().then((response)=>{
+revokeAccessToken().then((response) => {
     console.log(response);
-}).catch((error)=>{
+}).catch((error) => {
     console.error(error);
 })
 ```
@@ -436,9 +436,9 @@ This method sends a refresh-token request and returns a promise that resolves wi
 #### Example
 
 ```TypeScript
-refreshAccessToken().then((response)=>{
+refreshAccessToken().then((response) => {
     console.log(response);
-}).catch((error)=>{
+}).catch((error) => {
     console.error(error);
 })
 ```
@@ -448,7 +448,7 @@ refreshAccessToken().then((response)=>{
 ### getAccessToken
 
 ```TypeScript
-getAccessToken = async()
+getAccessToken = async ()
 ```
 
 #### Description
@@ -504,7 +504,7 @@ const pkce = getPKCECode();
 ### setPKCECode
 
 ```TypeScript
-setPKCECode= async(pkce:string)
+setPKCECode = async (pkce:string)
 ```
 
 #### Arguments
