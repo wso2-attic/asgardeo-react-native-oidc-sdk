@@ -1,152 +1,173 @@
-import React, {useEffect,useState} from 'react';
-import {Linking,Alert} from 'react-native';
-import {Page,Form,FormLabel,FormValue,Heading,ButtonContainer,Button} from '../components'
-import {requestAccessTokenDetails,SignOut,getSignOutURL,userInformation,refreshAccessToken,isAuthenticated,getAccessToken, getOIDCServiceEndpoints,getDecodedIDToken,revokeAccessToken}from '../src/authenticate'
+/**
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
+import {
+  SignOut,
+  getSignOutURL,
+  refreshAccessToken,
+  getDecodedIDToken,
+} from '@asgardeo/auth-react-native';
+import React, { useEffect, useState } from 'react';
+import { Linking, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { ButtonContainer, Button } from '../components';
+import { styles } from '../components/styles';
 
 const defaultAuthState = {
-  accessToken: '',
-  expiresIn:'',
   refreshToken: '',
-  idToken:"",
-  scope:"",
-  haslogin:false
+  idToken: '',
+  haslogin: false,
 };
 
-const SignIn =({route,navigation}) =>{    
+const defaultDecodeID = {
+  amr: '',
+  at_hash: '',
+  aud: '',
+  azp: '',
+  c_hash: '',
+  exp: '',
+  iat: '',
+  iss: '',
+  nbf: '',
+  sub: '',
+};
 
+const SignIn = ({ route, navigation }) => {
   const [authState, setAuthState] = useState(defaultAuthState);
-   
-      if (authState.haslogin==false){
+  const [authID, setAuthID] = useState(defaultDecodeID);
 
-        Linking.openURL(route.params.url) // Linking the AuthorizeUrl through the internet
+  const handleRefreshtoken = async () => {
+    // refreshtoken
+    refreshAccessToken()
+      .then((reftoken) => {
+        setAuthState({ ...reftoken, haslogin: true });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    const decodeID = await getDecodedIDToken();
+    setAuthID({ ...decodeID, c_hash: route.params.token.c_hash });
+  };
 
-      }
+  const handleSignOut = async () => {
+    // signout
+    const signOutUrl = await getSignOutURL();
+    Linking.openURL(signOutUrl);
+  };
 
-      useEffect(() => {
-        
-        Linking.addEventListener("url", handleAuthUrl);   
+  useEffect(() => {
+    Linking.addEventListener('url', handleopenUrl);
+  }, []);
 
-      }, []);
+  const handleopenUrl = async (Url) => {
+    const _signOut = SignOut(Url);
 
+    if (_signOut === true) {
+      navigation.navigate('LoginScreen');
+    } else {
+      authState;
+    }
+  };
 
-        let unmounded= false;
+  return (
+    <View style = { styles.flexContainer }>
+      <View style = { styles.flex }>
+        { route.params.token.sessionState ? (
+          <View>
+            <Text style = { styles.flexheading }>
+              Hi { route.params.token.username } !
+            </Text>
+            <Text style = { styles.flexbody }>
+              AllowedScopes : { route.params.token.allowedScopes }
+            </Text>
+            <Text style = { styles.flexbody }>SessionState : </Text>
+            <Text style = { styles.flexdetails }>
+              { route.params.token.sessionState }
+            </Text>
+          </View>
+        ) : null }
+      </View>
 
-        handleAuthUrl= async (Url)=>{
-          
-         
-          if (!unmounded){
-            requestAccessTokenDetails(Url,route.params.config).then((token )=>{ // get param of authorization url and return token details
-              //console.log("ReAccessToken", token)
-              setAuthState({...token})
-          
-            }).catch((error)=>{
-                console.log(error)
-            });
-          
-            unmounded = true;
-          }
-          //const endpoints = await getOIDCServiceEndpoints();
-          //console.log("endpoints", endpoints)
-          //const decodedIdToken = await getDecodedIDToken();
-          //console.log("decodedIdToken", decodedIdToken)
-          //const accessToken = await getAccessToken();
-          //console.log("accesstoken", accessToken)
-          //console.log(await isAuthenticated())
-          
-        }
-      
-      handleRefreshtoken =async () =>{                                   // refreshtoken
-        refreshAccessToken(route.params.config).then(reftoken =>{ 
-            setAuthState({...reftoken,haslogin:true})
-  
-        }).catch((error)=>{
-            console.log(error)
-        });
-      }
-
-
-      handleSignOut = async ()=>{                                      // signout
-        const signOutUrl = await getSignOutURL()
-        //console.log("signOutUrl",signOutUrl)
-        Linking.openURL(signOutUrl)
-        }
-      
-        useEffect(() => {
-          Linking.addEventListener("url", handleopenUrl);   
-        }, []);
-
-        handleopenUrl=async (Url)=>{
-          _signOut = SignOut(Url)
-          
-            if (_signOut==true){
-            
-              navigation.navigate("LoginScreen");
-            }else{
-              authState
-            }
-            unmounded = true;
-          
-      }
-
-      UserInfoAlert = async() =>{                                     // UserInfo
-        const UserInfo =  await userInformation()
-        Alert.alert(
-          'User Info',
-          "User Name : "+ UserInfo.username+"\n"+"User Email : "+ UserInfo.email,
-          
-          console.log("User info",UserInfo),
-          // revokeAccessToken(route.params.config).then((response)=>{
-          //    console.log("revokeAccess",response);
-          //  }).catch((error)=>{
-          //     console.error(error);
-          // })
-          
-        );
-            
-      }
-
-      return (
-          <Page>
-          {!!authState.accessToken ? (
-             <Form>
-             <FormLabel>accessToken</FormLabel>
-                <FormValue>{authState.accessToken}</FormValue>
-             <FormLabel>accessTokenExpirationDate</FormLabel>
-                <FormValue>{authState.expiresIn}</FormValue>
-             <FormLabel>refreshToken</FormLabel>
-                <FormValue>{authState.refreshToken}</FormValue>
-             <FormLabel>scopes</FormLabel>
-                <FormValue>{authState.scope}</FormValue>
-             <FormLabel>ID token</FormLabel>
-                <FormValue>{authState.idToken}</FormValue>
-           </Form>
-           ) : (
-             <Heading>'Goodbye.' : 'Hello, stranger.'</Heading>
-           )}
-       <ButtonContainer>
-        {!!authState.accessToken ? (
+      <View style = { styles.flex }>
+        { authState.refreshToken ? (
+          <View>
+            <Text style = { styles.flexheading }>Refresh token</Text>
+            <Text style = { styles.reftoke }>{ authState.refreshToken }</Text>
+          </View>
+        ) : (
           <>
-            <Button  onPress={handleSignOut} text="SignOut"  color="#FF8000"   />
-            
+            <View>
+              <Text style = { styles.flexheading }>Refresh token</Text>
+              <Text style = { styles.refbody }>
+                { route.params.token.refreshToken }
+              </Text>
+            </View>
           </>
-        ) : null}
+        )}
+      </View>
 
-        {!!authState.refreshToken ? (
-          <Button onPress={UserInfoAlert} text="UserInfo" color="#000066" />
-        ) : null}
+      <View style = { styles.flex }>
+        { authState.idToken ? (
+          <View>
+            <Text style = { styles.flexheading }>Decoded ID token</Text>
+            <Text style = { styles.body }>amr : { authID.amr }, { '\n' }at_hash : { authID.at_hash }, { '\n' }aud: { authID.aud }, {'\n'}azp : { authID.azp }, {'\n'}c_hash : { authID.c_hash }, {'\n'}exp : { authID.exp }, {'\n'}iat : { authID.iat }, {'\n'}iss : { authID.iss }, {'\n'}nbf :  {authID.nbf }, {'\n'}sub : { authID.sub }</Text>
+          </View>
+        ) : (
+          <>
+            <View>
+              <Text style = { styles.deco }>Decoded ID token</Text>
+              <Text style = { styles.body }>amr : { route.params.token.amr },{ '\n' }at_hash : { route.params.token.at_hash },{ '\n' }aud: { route.params.token.aud },{ '\n' }azp : { route.params.token.azp },{ '\n'} c_hash : { route.params.token.c_hash },{ '\n' }exp : { route.params.token.exp },{'\n' }iat : { route.params.token.iat },{ '\n' }iss : { route.params.token.iss },{ '\n' }nbf : { route.params.token.nbf },{ '\n' }sub : { route.params.token.sub }</Text>
+            </View>
+          </>
+        )}
+      </View>
 
-        {!!authState.refreshToken ? (
-          <Button onPress={handleRefreshtoken} text="Refresh" color="#FF3333" />
-        ) : null}
+      <ScrollView>
+        <View style = { styles.flex }>
+          { authState.idToken ? (
+            <View>
+              <Text style = { styles.flexheading }>ID token</Text>
+              <Text style = { styles.body }>{ authState.idToken }</Text>
+            </View>
+          ) : (
+            <>
+              <View>
+                <Text style = { styles.flexheading }>ID token</Text>
+                <Text style = { styles.body }>{ route.params.token.idToken }</Text>
+              </View>
+            </>
+          )}
+        </View>
+      </ScrollView>
 
-        
-        
+      <ButtonContainer>
+        { route.params.token.sessionState ? (
+          <>
+            <Button onPress = { handleSignOut } text = "SignOut" color = "#FF8000" />
+          </>
+        ) : null }
+
+        { route.params.token.sessionState ? (
+          <Button onPress = { handleRefreshtoken } text = "Refresh" color = "#FF3333" />
+        ) : null }
       </ButtonContainer>
+    </View>
+  );
+};
 
-       </Page>
-         );
-                  
- }; 
-        
 export default SignIn;

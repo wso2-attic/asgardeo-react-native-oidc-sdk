@@ -15,22 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import{ initialize, getAuthorizationURL, requestAccessTokenDetails, refreshAccessToken, getAccessToken, getDataLayer, getDecodedIDToken, getOIDCServiceEndpoints, getSignOutURL, SignOut, userInformation, revokeAccessToken } from "./src/authenticate"
 
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-
-const ButtonContainer = props => <View style={styles.view} {...props} />;
-
-const styles = StyleSheet.create({
-  view: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignSelf: 'flex-end',
-    flexDirection: 'row',
-    margin: 5
-  }
-});
-
-export default ButtonContainer;
+export{ initialize, getAuthorizationURL, requestAccessTokenDetails, refreshAccessToken, getAccessToken, getDataLayer, getDecodedIDToken, getOIDCServiceEndpoints, getSignOutURL, SignOut, userInformation, revokeAccessToken };

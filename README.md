@@ -31,6 +31,11 @@ Asgardeo's OIDC SDK for React Native allows Mobile Applications to use OIDC or O
 
 ## Install
 
+Install the library from the npm registry.
+```
+npm install --save @asgardeo/auth-react-native
+```
+
 ## Getting Started
 
 You can experience the capabilities of Asgardeo React-native OIDC SDK by following this small guide which contains main
@@ -51,13 +56,19 @@ sections listed below.
     ii. Provide a name for the Service Provider (ex:- sampleRN-app) and click `Register`. Now you will be redirected to the
     `Edit Service Provider` page.<br/>
     iii. Expand the `Inbound Authentication Configuration` section and click `Configure` under the `OAuth/OpenID Connect Configuration` section.<br/>
-    iv. Provide the following values for the respective fields and click `Update` while keeping other default settings as it is.
+    iv. Under Allowed `Grant Types` uncheck everything except `Code` and `Refresh Token`.
+    v. Enter Callback URL(s) like as the following values. 
 
-        Callback Url - http://10.0.2.2:8081
-        Allow authentication without the client secret - True
-
-    v. Click `Update` to save.
-
+        Callback Url - http://{hostname}:{port}
+        
+       ##### Example (If Run Application using emulator)
+       ```TypeScript
+       Callback Url - http://10.0.2.2:8081
+   
+   vi. Check `Allow authentication without the client secret`.
+   
+   vii. Click `Update` to save.
+   
 3.  Once the service provider is saved, you will be redirected to the `Service Provider Details` page. Here, expand the
     `Inbound Authentication Configuration` section and click the `OAuth/OpenID Connect Configuration` section. Copy the
     value of `OAuth Client Key` shown here.
@@ -74,23 +85,23 @@ sections listed below.
    - Replace the value of `client-id` with the value of `OAuth Client Key` property which you copied in the step 3 when
      [configuring the Identity Server](#configuring-the-identity-server).
 
-   ```json
-     const Config ={
-      serverOrigin:"https://10.0.2.2:9443",
-      signInRedirectURL:"http://10.0.2.2:8081",
-      clientID: "ClientID",
-      SignOutURL: "http://10.0.2.2:8081"
+   ```TypeScript
+    const Config = {
+      serverOrigin: 'https://{hostname}:9443',
+      signInRedirectURL: 'http://{hostname}:{port}',
+      clientID: 'ClientID',
+      SignOutURL: "http://{hostname}:{port}"       (Optional)
     };
    ```
 
    Example:
 
-   ```json
-    const Config ={
-      serverOrigin:"https://10.0.2.2:9443",
-      signInRedirectURL:"http://10.0.2.2:8081",
-      clientID: "iMc7TiIaIFafkd5hA5xf7kGiAWUa",
-      SignOutURL: "http://10.0.2.2:8081"
+   ```TypeScript
+    const Config = {
+      serverOrigin: 'https://10.0.2.2:9443',
+      signInRedirectURL: 'http://10.0.2.2:8081',
+      clientID: 'iMc7TiIaIFafkd5hA5xf7kGiAWUa',
+      SignOutURL: "http://10.0.2.2:8081"       (Optional)
     };
    ```
 
@@ -101,7 +112,7 @@ sections listed below.
 1. Create a suitable Android Virtual Device by run `react-native run-android` command in project directory terminal.
 
 2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config`
-   file to “10.0.2.2”. Refer the documentation on [emulator-networking](https://reactnative.dev/docs/environment-setup)
+   file to “10.0.2.2”. Refer the documentation on [emulator-networking](https://developer.android.com/studio/run/emulator-networking)
 
 3. By default IS uses a self-signed certificate. If you are using the default pack without
    changing to a CA signed certificate, follow this [guide](https://developer.android.com/training/articles/security-config) to get rid of SSL issues.
@@ -113,7 +124,7 @@ sections listed below.
    keytool -genkey -alias wso2carbon -keyalg RSA -keystore wso2carbon.jks -keysize 2048 -ext SAN=IP:10.0.2.2
    ```
 
-   ii. Export the public certificate (name it as wso2carbon.pem)to add into the truststore.
+   ii. Export the public certificate ( name it as wso2carbon.pem ) to add into the truststore.
 
    ```
    keytool -exportcert -alias wso2carbon -keystore wso2carbon.jks -rfc -file wso2carbon.pem
@@ -125,7 +136,7 @@ sections listed below.
    keytool -import -alias wso2is -file wso2carbon.pem -keystore client-truststore.jks -storepass wso2carbon
    ```
 
-   iv. Now copy this public certificate (wso2carbon.pem) into the `app/src/main/res/raw` folder.
+   iv. Now copy this public certificate ( wso2carbon.pem ) into the `app/src/main/res/raw` folder.
 
 5. Select the Virtual Device to run the application.
 6. Run the the module `sample` on the selected Virtual Device.
@@ -135,8 +146,7 @@ sections listed below.
 1. Enable USB Debugging in the Developer Options in the Android Device. Refer documentation on
    [Run your App](https://reactnative.dev/docs/running-on-device).
 
-2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config` file and the hostnames specified under `hostname` config
-   in the `<IS_HOME>/repository/conf/deployment.toml` file to the IP Address of local machine.
+2. If the WSO2 IS is hosted in the local machine, change the domain of the endpoints in the `Screen/LoginScreen - Config` file and the hostnames specified under `hostname` config in the `<IS_HOME>/repository/conf/deployment.toml` file to the IP Address of local machine.
    Make sure that both the Android Device and the local machine is connected to the same WIFI network.
 
 3. By default IS uses a self-signed certificate. If you are using the default pack without
@@ -149,7 +159,7 @@ sections listed below.
    keytool -genkey -alias wso2carbon -keyalg RSA -keystore wso2carbon.jks -keysize 2048 -ext SAN=IP:IP Address
    ```
 
-   ii. Export the public certificate (name it as wso2carbon.pem)to add into the truststore.
+   ii. Export the public certificate ( name it as wso2carbon.pem ) to add into the truststore.
 
    ```
    keytool -exportcert -alias wso2carbon -keystore wso2carbon.jks -rfc -file wso2carbon.pem
@@ -161,7 +171,7 @@ sections listed below.
    keytool -import -alias wso2is -file wso2carbon.pem -keystore client-truststore.jks -storepass wso2carbon
    ```
 
-   iv. Now copy this public certificate (wso2carbon.pem) into the `app/src/main/res/raw` folder.
+   iv. Now copy this public certificate ( wso2carbon.pem ) into the `app/src/main/res/raw` folder.
 
 5. Connect the Android Device to the machine through a USB cable.
 
@@ -172,11 +182,26 @@ sections listed below.
 ## APIs
 
 The SDK provides some APIs necessary methods to implement an authentication.
+  - [initialize](#initialize)
+  - [getDataLayer](#getdatalayer)
+  - [getAuthorizationURL](#getauthorizationurl)
+  - [requestAccessTokenDetails](#requestaccesstokendetails)
+  - [getSignOutUrl](#getsignouturl)
+  - [SignOut](#signout)
+  - [getOIDCServiceEndpoints](#getoidcserviceendpoints)
+  - [getDecodedIDToken](#getdecodedidtoken)
+  - [userInformation](#userinformation)
+  - [revokeAccessToken](#revokeaccesstoken)
+  - [refreshAccessToken](#refreshaccesstoken)
+  - [getAccessToken](#getaccesstoken)
+  - [isAuthenticated](#isauthenticated)
+  - [getPKCECode](#getpkcecode)
+  - [setPKCECode](#setpkcecode)
 
 ### initialize
 
 ```TypeScript
-initialize=async(config):Promise<void> ;
+initialize = async (config):Promise<void> ;
 ```
 
 #### Arguments
@@ -191,12 +216,12 @@ This method initializes the config data instance.
 #### Example
 
 ```TypeScript
-const Config ={
-      serverOrigin:"https://10.0.2.2:9443",
-      signInRedirectURL:"http://10.0.2.2:8081",
-      clientID: "Client ID",
-      SignOutURL: "http://10.0.2.2:8081/Login"
-    };
+const Config = {
+  serverOrigin: 'https://10.0.2.2:9443',
+  signInRedirectURL: 'http://10.0.2.2:8081',
+  clientID: 'iMc7TiIaIFafkd5hA5xf7kGiAWUa',
+  SignOutURL: "http://10.0.2.2:8081"       (Optional)
+};
 
 
 await initialize(Config)
@@ -207,7 +232,7 @@ await initialize(Config)
 ### getDataLayer
 
 ```TypeScript
-getDataLayer= async ()
+getDataLayer = async ()
 ```
 
 #### Description
@@ -225,7 +250,7 @@ const _dataLayer = await getDataLayer();
 ### getAuthorizationURL
 
 ```TypeScript
-getAuthorizationURL= async(config): Promise<String>
+getAuthorizationURL = async (config): Promise<String>
 ```
 
 #### Arguments
@@ -253,16 +278,13 @@ getAuthorizationURL(Config).then((url) => {
 ### requestAccessTokenDetails
 
 ```TypeScript
-requestAccessTokenDetails = (AuthUrl,config)
+requestAccessTokenDetails = (AuthUrl)
 ```
 
 #### Arguments
 
 1. AuthUrl
    This is a url. After the user signs in with using Identity server can get this url. It contains sessionState and authorizationCode these are obtained from identity server.
-2. config:
-   This config contains the ClientID, server Origin, SigINRedirectURL, SighOutRedirectUrl,and etc. This information needed to umplement the authentication.
-
 #### Description
 
 This method uses the authorization code and session state to send a request to the token endpoint to obtain the acess token and the id token. The sign-in functionality can be implemented by calling the getAuthorizationURL method followed by this method.
@@ -270,9 +292,9 @@ This method uses the authorization code and session state to send a request to t
 #### Example
 
 ```TypeScript
-requestAccessTokenDetails(AuthUrl,Config).then((token)=>{
+requestAccessTokenDetails(AuthUrl).then((token) => {
     console.log(token)
-}).catch((error)=>{
+}).catch((error) => {
     console.log(error)
 });
 ```
@@ -302,7 +324,7 @@ Linking.openURL(signOutUrl)
 ### SignOut
 
 ```
-SignOut= (Url)
+SignOut = (Url)
 ```
 
 #### Arugument
@@ -325,7 +347,7 @@ _signOut = SignOut(Url)
 ### getOIDCServiceEndpoints
 
 ```TypeScript
-getOIDCServiceEndpoints= async()
+getOIDCServiceEndpoints = async()
 ```
 
 #### Description
@@ -344,7 +366,7 @@ const endpoints = await getOIDCServiceEndpoints();
 ### getDecodedIDToken
 
 ```TypeScript
-getDecodedIDToken = async()
+getDecodedIDToken = async ()
 ```
 
 #### Description
@@ -382,7 +404,7 @@ const UserInfo =  await userInformation();
 ### revokeAccessToken
 
 ```TypeScript
-revokeAccessToken= async(config)
+revokeAccessToken = async ()
 ```
 
 #### Description
@@ -392,9 +414,9 @@ This method clears the authentication data and sends a request to revoke the acc
 #### Example
 
 ```TypeScript
-revokeAccessToken().then((response)=>{
+revokeAccessToken().then((response) => {
     console.log(response);
-}).catch((error)=>{
+}).catch((error) => {
     console.error(error);
 })
 ```
@@ -404,7 +426,7 @@ revokeAccessToken().then((response)=>{
 ### refreshAccessToken
 
 ```TypeScript
- refreshAccessToken = async (config): Promise<TokenResponse>
+ refreshAccessToken = async (): Promise<TokenResponse>
 ```
 
 #### Description
@@ -414,9 +436,9 @@ This method sends a refresh-token request and returns a promise that resolves wi
 #### Example
 
 ```TypeScript
-refreshAccessToken(Config).then((response)=>{
+refreshAccessToken().then((response) => {
     console.log(response);
-}).catch((error)=>{
+}).catch((error) => {
     console.error(error);
 })
 ```
@@ -426,7 +448,7 @@ refreshAccessToken(Config).then((response)=>{
 ### getAccessToken
 
 ```TypeScript
-getAccessToken = async()
+getAccessToken = async ()
 ```
 
 #### Description
@@ -482,7 +504,7 @@ const pkce = getPKCECode();
 ### setPKCECode
 
 ```TypeScript
-setPKCECode= async(pkce:string)
+setPKCECode = async (pkce:string)
 ```
 
 #### Arguments
@@ -504,10 +526,8 @@ setPKCECode("pkce");
 ---
 
 ## Develop
-
 ### Prerequisites
-
-### Installing Dependencies
+-    [React Native Environment setup](https://reactnative.dev/docs/environment-setup)
 
 ## Contribute
 
