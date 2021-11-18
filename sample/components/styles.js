@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     justifyContent: 'center',
-    fontSize: 30,
+    fontSize: 25,
     borderBottomColor: '#e2e2e2',
     borderBottomWidth: 2,
   },
@@ -119,6 +119,17 @@ const styles = StyleSheet.create({
   refbody: {
     textAlign: 'center',
   },
+
+  loading: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: '#F5FCFF88',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
 });
 
 export { styles };

@@ -23,13 +23,16 @@ import {
   requestAccessTokenDetails,
   userInformation,
   getDecodedIDToken,
+  getAccessToken
 } from '@asgardeo/auth-react-native';
 import React from 'react';
-import { View, Image, Text, Button, Linking } from 'react-native';
+import { View, Image, Text, Button, Linking, ActivityIndicator } from 'react-native';
+import url from 'url';
 import { styles } from '../components/styles';
+import { loginState, updateLoginState } from '../data/state';
 
 // Create a config object containing the necessary configurations.
-//for emulator
+// For emulator.
 const Config = {
   serverOrigin: 'https://10.0.2.2:9443',
   signInRedirectURL: 'http://10.0.2.2:8081',
@@ -37,7 +40,7 @@ const Config = {
   //SignOutURL: "http://10.0.2.2:8081"       (Optional)
 };
 
-// for device
+// For device.
 //  const Config ={
 //    serverOrigin:"https://192.168.43.29:9443",
 //    signInRedirectURL:"http://192.168.43.29:8081",
@@ -46,70 +49,101 @@ const Config = {
 //  };
 
 class LoginScreen extends React.Component {
+
   constructor(props) {
+
     super(props);
     this.state = {
-      refreshToken: '',
-      idToken: '',
-      haslogin: false,
-      allowedScopes: '',
-      username: '',
-      sessionState: '',
-      amr: '',
-      at_hash: '',
-      aud: '',
-      azp: '',
-      c_hash: '',
-      exp: '',
-      iat: '',
-      iss: '',
-      nbf: '',
-      sub: '',
+      loading: false
     };
+
+    // Initializes the SDK with the config data.
+    initialize(Config);
   }
 
   componentDidMount() {
+
     Linking.addEventListener('url', this.handleAuthUrl);
   }
 
+  componentWillUnmount() {
+
+    Linking.removeEventListener('url', this.handleAuthUrl);
+  }
+
   handleAuthUrl = async (Url) => {
-    requestAccessTokenDetails(Url)
-      .then((token) => {
-        // get param of authorization url and return token details
-        this.setState({ ...token, haslogin: true });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+
+    if (url.parse(Url.url).query.indexOf("code=") > -1) {
+      this.setState({ loading: true });
+
+      // Get param of authorization url and return token details.
+      requestAccessTokenDetails(Url)
+        .then(async (token) => {
+          /**
+           * TODO: Remove this waiting once https://github.com/asgardeo/asgardeo-auth-js-sdk/issues/164 is fixed.
+           */
+          await getAccessToken();
+
+          updateLoginState({  ...token, haslogin: true });
+
+          userInformation().then((user) => {
+            updateLoginState(user);
+            getDecodedIDToken().then((decodeID) => {
+              updateLoginState(decodeID);
+              this.setState({ loading: false });
+              this.props.navigation.navigate('SignIn');
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   handleSubmitPress = async () => {
-    // initializes the SDK with the config data
-    await initialize(Config);
 
-    // authenticate with Identity server
-    getAuthorizationURL(Config)
+    // Authenticate with Identity server.
+    getAuthorizationURL()
       .then((url) => {
-        if (this.state.haslogin === false) {
-          Linking.openURL(url); // Linking the AuthorizeUrl through the internet
+        if (loginState.haslogin === false) {
+          // Linking the AuthorizeUrl through the internet.
+          Linking.openURL(url);
         } else {
+          this.setState({ loading: true });
+          
           userInformation().then((user) => {
-            this.setState({ ...user });
-
+            updateLoginState(user);
             getDecodedIDToken().then((decodeID) => {
-              this.setState({ ...decodeID });
-              this.props.navigation.navigate('SignIn', { token: this.state });
-              this.setState({ haslogin: false });
+              updateLoginState(decodeID);
+              this.setState({ loading: false });
+              this.props.navigation.navigate('SignIn');
+            })
+            .catch((error) => {
+              this.setState({ loading: false });
+              console.log(error);
             });
+          })
+          .catch((error) => {
+            this.setState({ loading: false });
+            console.log(error);
           });
         }
       })
       .catch((error) => {
+        this.setState({ loading: false });
         console.error(error);
       });
   };
 
   render() {
+
     return (
       <View style = { styles.mainBody }>
         <View>
@@ -145,6 +179,12 @@ class LoginScreen extends React.Component {
                 title = "Login"
               />
             </View>
+            {
+              this.state.loading ? 
+              <View style={ styles.loading } pointerEvents="none">
+                <ActivityIndicator size="large" color="#FF8000" />
+              </View> : null
+            }
           </View>
 
           <View style = { styles.footer }>

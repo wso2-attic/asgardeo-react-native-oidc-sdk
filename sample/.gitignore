@@ -57,3 +57,6 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+
+# Certificate
+android/app/src/main/res/raw/wso2carbon.pem
