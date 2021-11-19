@@ -27,8 +27,10 @@ import { AsgardeoAuthException } from "../exception";
 import { DecodedIDTokenPayload, JWKInterface } from "@asgardeo/auth-js";
 
 export class CryptoUtils {
+
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     private constructor() {}
+
     /**
      * Get URL encoded string.
      *
@@ -36,6 +38,7 @@ export class CryptoUtils {
      * @returns {string} base 64 url encoded value.
      */
     public static base64URLEncode(value: CryptoJS.WordArray): string {
+
         return Base64.stringify(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
     }
 
@@ -45,6 +48,7 @@ export class CryptoUtils {
      * @returns {string} code verifier.
      */
     public static getCodeVerifier(): string {
+
         return this.base64URLEncode(WordArray.random(32));
     }
 
@@ -55,6 +59,7 @@ export class CryptoUtils {
      * @returns {string} code challenge.
      */
     public static getCodeChallenge(verifier: string): string {
+
         return this.base64URLEncode(sha256(verifier));
     }
 
@@ -64,6 +69,7 @@ export class CryptoUtils {
      * @returns {string[]} array of supported algorithms.
      */
     public static getSupportedSignatureAlgorithms(): string[] {
+
         return ["RS256", "RS512", "RS384", "PS256"];
     }
 
@@ -76,6 +82,7 @@ export class CryptoUtils {
      */
     /* eslint-disable @typescript-eslint/no-explicit-any */
     public static getJWKForTheIdToken(jwtHeader: string, keys: JWKInterface[]): Promise<KeyLike> {
+
         const headerJSON = JSON.parse(atob(jwtHeader));
 
         for (const key of keys) {
@@ -122,13 +129,14 @@ export class CryptoUtils {
         username: string,
         clockTolerance: number
     ): Promise<boolean> {
+
         return jwtVerify(idToken, jwk, {
-            algorithms: this.getSupportedSignatureAlgorithms(),
-            audience: clientID,
-            clockTolerance: clockTolerance,
-            issuer: issuer,
-            subject: username
-        })
+                algorithms: this.getSupportedSignatureAlgorithms(),
+                audience: clientID,
+                clockTolerance: clockTolerance,
+                issuer: issuer,
+                subject: username
+            })
             .then(() => {
                 return Promise.resolve(true);
             })
@@ -153,6 +161,7 @@ export class CryptoUtils {
      * @return {DecodedIdTokenPayloadInterface} - The decoded payload of the id token.
      */
     public static decodeIDToken(idToken: string): DecodedIDTokenPayload {
+
         try {
             const words = Base64.parse(idToken.split(".")[1]);
             const utf8String = utf8.stringify(words);

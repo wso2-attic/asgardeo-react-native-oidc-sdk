@@ -18,7 +18,7 @@
 
 import { OIDCEndpoints } from "@asgardeo/auth-js";
 
-export const SERVICE_RESOURCES: OIDCEndpoints  = {
+export const SERVICE_RESOURCES: OIDCEndpoints = {
     authorizationEndpoint: "/oauth2/authorize",
     checkSessionIframe: "/oidc/checksession",
     endSessionEndpoint: "/oidc/logout",

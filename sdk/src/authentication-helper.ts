@@ -42,17 +42,18 @@ import {
 import { auth } from "./store";
 
 export class AuthenticationHelper<T> {
-    
+
     private _config: () => Promise<AuthClientConfig>;
     private _oidcProviderMetaData: () => Promise<OIDCProviderMetaData>;
 
     public constructor(dataLayer: DataLayer<T>) {
-       
+
         this._config = async () => await auth.getDataLayer().getConfigData();
         this._oidcProviderMetaData = async () => await auth.getDataLayer().getOIDCProviderMetaData();
     }
 
     public async resolveWellKnownEndpoint(): Promise<string> {
+
         const configData = await this._config();
         if (configData.wellKnownEndpoint) {
             return configData.serverOrigin + configData.wellKnownEndpoint;
@@ -62,6 +63,7 @@ export class AuthenticationHelper<T> {
     }
 
     public async resolveEndpoints(response: OIDCProviderMetaData): Promise<OIDCProviderMetaData> {
+
         const oidcProviderMetaData = {};
         const configData = await this._config();
 
@@ -86,11 +88,10 @@ export class AuthenticationHelper<T> {
         return { ...response, ...oidcProviderMetaData };
     }
 
-
-
     public async validateIdToken(idToken: string): Promise<boolean> {
+
         const jwksEndpoint = (await auth.getDataLayer().getOIDCProviderMetaData()).jwks_uri;
-        
+
         if (!jwksEndpoint || jwksEndpoint.trim().length === 0) {
             return Promise.reject(
                 new AsgardeoAuthException(
@@ -104,18 +105,18 @@ export class AuthenticationHelper<T> {
             );
         }
 
-        return fetch (jwksEndpoint,{
-            method: "GET",
-            disableAllSecurity: true,
-            sslPinning: {
-                certs: ["wso2carbon"], // TODO: make the certificate name configurable
-              },
-              headers: {
-                Accept: `application/json`,
-                "Content-Type": "application/x-www-form-urlencoded"
-              }
+        return fetch (jwksEndpoint, {
+                method: "GET",
+                disableAllSecurity: true,
+                sslPinning: {
+                    certs: ["wso2carbon"], // TODO: make the certificate name configurable
+                },
+                headers: {
+                    Accept: `application/json`,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
             })
-            .then(async (response) => {  
+            .then(async (response) => {
                 if (response.status !== 200) {
                     return Promise.reject(
                         new AsgardeoAuthException(
@@ -130,13 +131,13 @@ export class AuthenticationHelper<T> {
 
                 const issuer = (await this._oidcProviderMetaData()).issuer;
                 const issuerFromURL = (await this.resolveWellKnownEndpoint()).split("/.well-known")[0];
-                
+
                 // Return false if the issuer in the open id config doesn't match
                 // the issuer in the well known endpoint URL.
                 if (!issuer || issuer == issuerFromURL) { 
                     return Promise.resolve(false);
                 }
-                
+
                 const data = JSON.parse(response.bodyString);
 
                 return CryptoUtils.getJWKForTheIdToken(idToken.split(".")[0], data.keys)
@@ -149,20 +150,19 @@ export class AuthenticationHelper<T> {
                             AuthenticationUtils.getAuthenticatedUserInfo(idToken).username,
                             (await this._config()).clockTolerance
                         )
-                            .then(response => response)
-                            
-                            .catch((error) => {
-                                return Promise.reject(
-                                    new AsgardeoAuthException(
-                                        "AUTH_HELPER-VIT-ES03",
-                                        "authentication-helper",
-                                        "validateIdToken",
-                                        null,
-                                        null,
-                                        error
-                                    )
-                                );
-                            });
+                        .then(response => response)
+                        .catch((error) => {
+                            return Promise.reject(
+                                new AsgardeoAuthException(
+                                    "AUTH_HELPER-VIT-ES03",
+                                    "authentication-helper",
+                                    "validateIdToken",
+                                    null,
+                                    null,
+                                    error
+                                )
+                            );
+                        });
                     })
                     .catch((error) => {
                         return Promise.reject(
@@ -194,15 +194,15 @@ export class AuthenticationHelper<T> {
             });
     }
 
-
     public async clearUserSessionData(): Promise<void> {
-        
+
         await auth.getDataLayer().removeOIDCProviderMetaData();
         await auth.getDataLayer().removeTemporaryData();
         await auth.getDataLayer().removeSessionData();
     }
 
     public async replaceCustomGrantTemplateTags(text: string): Promise<string> {
+
         let scope = OIDC_SCOPE;
         const configData = await this._config();
         const sessionData = await auth.getDataLayer().getSessionData();
@@ -223,7 +223,7 @@ export class AuthenticationHelper<T> {
     }
 
     public async handleTokenResponse(response): Promise<TokenResponse> {
-        
+
         if (response.status !== 200) {
             return Promise.reject(
                 new AsgardeoAuthException(
@@ -235,7 +235,7 @@ export class AuthenticationHelper<T> {
                 )
             );
         }
-        
+
         if ((await this._config()).validateIDToken) {
             const data = JSON.parse(response.bodyString);
             return this.validateIdToken(data.id_token)

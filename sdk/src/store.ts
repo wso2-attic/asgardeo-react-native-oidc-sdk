@@ -22,38 +22,40 @@ import { AsgardeoAuthClient } from '@asgardeo/auth-js';
 
 // Create a Store class to store the authentication data. The following implementation uses the async-storage.
 class LocalStorage {
- 
-  // get the data from the store.
-  async getData(key:string){
-    const _value = await AsyncStorage.getItem(key)
-    return _value
-  }
-   
-  // save the data into the store
-  async setData(key:string,value:string){
-    try{
-      await AsyncStorage.setItem(key, value);
-    }
-    catch(error){
-      console.log(error)
-    
-    }
-  }
 
-  // remove the data from the store.
-  async removeData(key:string){
-    try{
-      await AsyncStorage.removeItem(key)
-    }
-    catch(error){
-      console.log(error)
-    }
-  }
+    // Get the data from the store.
+    async getData(key:string) {
 
+        const _value = await AsyncStorage.getItem(key);
+        return _value;
+    }
+
+    // Save the data into the store.
+    async setData(key:string,value:string) {
+
+        try {
+            await AsyncStorage.setItem(key, value);
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
+
+    // Remove the data from the store.
+    async removeData(key:string) {
+
+        try {
+            await AsyncStorage.removeItem(key);
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
 }
 
-// Instantiate the LocalStore class
+// Instantiate the LocalStore class.
 const store = new LocalStorage();
 
-// Instantiate the AsgardeoAuthClient and pass the store object as an argument into the constructor of the asgardeo-auth-js sdk.
+// Instantiate the AsgardeoAuthClient and pass the store object as an argument into the constructor of 
+// the asgardeo-auth-js sdk.
 export const auth = new AsgardeoAuthClient(store);

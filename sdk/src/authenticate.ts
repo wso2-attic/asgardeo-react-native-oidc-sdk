@@ -21,14 +21,12 @@ import {
     TokenResponse,
     SESSION_STATE,
     PKCE_CODE_VERIFIER,
-    DecodedIDTokenPayload,
   } from '@asgardeo/auth-js';
 import { 
     AsgardeoAuthException,
     AsgardeoAuthNetworkException,
  } from './exception'
 import { AuthenticationHelper } from './authentication-helper';
-import { CryptoUtils } from "./utils"
 import { fetch } from 'react-native-ssl-pinning';
 import url from 'url';
 
@@ -36,18 +34,18 @@ import url from 'url';
  *
  * This method initializes the SDK with the config data.
  *
- *
  * @example
  * const Config ={
- * serverOrigin:"https://10.0.2.2:9443",
- * signInRedirectURL:"http://10.0.2.2:8081",
- * clientID: "ClientID",
- * SignOutURL: "http://10.0.2.2:8081"
+ *     serverOrigin:"https://10.0.2.2:9443",
+ *     signInRedirectURL:"http://10.0.2.2:8081",
+ *     clientID: "ClientID",
+ *     SignOutURL: "http://10.0.2.2:8081"
  * };
  *
  * initialize(config);
  */
 export const initialize = async(config):Promise<void> => {
+
     await auth.initialize(config);
 }
 
@@ -60,12 +58,12 @@ export const initialize = async(config):Promise<void> => {
  * ```
  * const data = await getDataLayer();
  * ```
- *
  */
 export const getDataLayer = async () => {
+
     return await auth.getDataLayer();
 }
-    
+
 /**
  * This is an async method that returns a Promise that resolves with the authorization URL.
  *
@@ -73,16 +71,15 @@ export const getDataLayer = async () => {
  *
  * @example
  * ```
- * auth.getAuthorizationURL(Config).then((url)=>{
- *  // console.log(url);
- *  this.props.navigation.navigate("SignIn",{url:url,config:Config}) // navigate it to SignIn page
- * }).catch((error)=>{
- *  // console.error(error);
+ * auth.getAuthorizationURL(Config).then((url) => {
+ *     this.props.navigation.navigate("SignIn",{url:url,config:Config}) // navigate it to SignIn page
+ * }).catch((error) => {
+ *     console.error(error);
  * });
  * ```
- * 
  */ 
 export const getAuthorizationURL = async (config):Promise<String> => { 
+
     return await auth.getAuthorizationURL(config);
 }
 
@@ -96,30 +93,31 @@ export const getAuthorizationURL = async (config):Promise<String> => {
  *
  * @example
  * ```
- * requestAccessTokenDetails(Authurl).then((token )=>{ // get param of authorization url and return token details
- *      console.log("ReAccessToken", token)
- *     setAuthState({...token})
- *
- * }).catch((error)=>{
- *    console.log(error)
+ * requestAccessTokenDetails(Authurl).then((token) => { // get param of authorization url and return token details
+ *     console.log("ReAccessToken", token);
+ *     setAuthState({...token});
+ * }).catch((error) => {
+ *     console.log(error);
  * });
  * ```
- *
  */
 export const requestAccessTokenDetails = (Authurl) => {
+
     const urlObject = url.parse(Authurl.url);
-    const data_list = urlObject.query.split('&')
-    const code = data_list[0].split('=')[1]
-    const session_state = data_list[1].split('=')[1]
-    return requestAccessToken(code,session_state)
+    const data_list = urlObject.query.split('&');
+    const code = data_list[0].split('=')[1];
+    const session_state = data_list[1].split('=')[1];
+
+    return requestAccessToken(code,session_state);
 }
 
 const requestAccessToken = async (authorizationCode, sessionState) : Promise<TokenResponse> => {
+
     const data = auth.getDataLayer();
-    const  _authenticationHelper = new AuthenticationHelper(data);
+    const _authenticationHelper = new AuthenticationHelper(data);
     const tokenEndpoint = (await data.getOIDCProviderMetaData()).token_endpoint;
     const configData = await auth.getDataLayer().getConfigData();
-        
+
     if (!tokenEndpoint || tokenEndpoint.trim().length === 0) {
         return Promise.reject(
             new AsgardeoAuthException(
@@ -136,69 +134,69 @@ const requestAccessToken = async (authorizationCode, sessionState) : Promise<Tok
     await data.setSessionDataParameter(SESSION_STATE, sessionState);
 
     const body: string[] = [];
-    body.push(`client_id=${configData.clientID}`)
+    body.push(`client_id=${configData.clientID}`);
 
     if (configData.clientSecret && configData.clientSecret.trim().length > 0) {
-        body.push(`client_secret=${configData.clientSecret}`)
+        body.push(`client_secret=${configData.clientSecret}`);
     }
 
     const code = authorizationCode;
-    body.push(`code=${code}`)
-    body.push("grant_type=authorization_code")
-    body.push(`redirect_uri=${configData.signInRedirectURL}`)
-    
+    body.push(`code=${code}`);
+    body.push("grant_type=authorization_code");
+    body.push(`redirect_uri=${configData.signInRedirectURL}`);
+
     if (configData.enablePKCE) {
-        body.push(`code_verifier=${await data.getTemporaryDataParameter(PKCE_CODE_VERIFIER)}`)
+        body.push(`code_verifier=${await data.getTemporaryDataParameter(PKCE_CODE_VERIFIER)}`);
         await data.removeTemporaryDataParameter(PKCE_CODE_VERIFIER);
     }
-    
-    return fetch(tokenEndpoint+"?", {
+
+    return fetch(tokenEndpoint + "?", {
         method: 'POST',
         disableAllSecurity: true,
         sslPinning: {
-        certs: ["wso2carbon"], // TODO: make the certificate name configurable
+            certs: ["wso2carbon"], // TODO: make the certificate name configurable
         },
         headers: {
-        Accept: `application/json`,
-        "Content-Type": "application/x-www-form-urlencoded"
+            Accept: `application/json`,
+            "Content-Type": "application/x-www-form-urlencoded"
         },
         body: body.join("&")
     })
     .then(response => {
-            return _authenticationHelper
-                .handleTokenResponse(response)
-                .then((response: TokenResponse) => response)
-                .catch((error) => {
-                    return Promise.reject(
-                        new AsgardeoAuthException(
-                            "AUTH_CORE-RAT1-ES02",
-                            "authentication-core",
-                            "requestAccessToken",
-                            null,
-                            null,
-                            error
-                        )
-                    );
-                });
-        })
-        .catch((error) => {
-            return Promise.reject(
-                new AsgardeoAuthNetworkException(
-                    "AUTH_CORE-RAT1-NR03",
-                    "authentication-core",
-                    "requestAccessToken",
-                    "Requesting access token failed",
-                    "The request to get the access token from the server failed.",
-                    error?.code,
-                    error?.message,
-                    error?.response?.status,
-                    error?.response?.data
-                )
-            );
-        });
+        return _authenticationHelper
+            .handleTokenResponse(response)
+            .then((response: TokenResponse) => response)
+            .catch((error) => {
+                return Promise.reject(
+                    new AsgardeoAuthException(
+                        "AUTH_CORE-RAT1-ES02",
+                        "authentication-core",
+                        "requestAccessToken",
+                        null,
+                        null,
+                        error
+                    )
+                );
+            });
+    })
+    .catch((error) => {
+        return Promise.reject(
+            new AsgardeoAuthNetworkException(
+                "AUTH_CORE-RAT1-NR03",
+                "authentication-core",
+                "requestAccessToken",
+                "Requesting access token failed",
+                "The request to get the access token from the server failed.",
+                error?.code,
+                error?.message,
+                error?.response?.status,
+                error?.response?.data
+            )
+        );
+    });
 }
 
-    /**
+/**
  * This method refreshes the access token and returns a Promise that resolves with the new access
  * token and other relevant data.
  *
@@ -206,22 +204,21 @@ const requestAccessToken = async (authorizationCode, sessionState) : Promise<Tok
  *
  * @example
  * ```
- * refreshAccessToken().then((response)=>{
- *  // console.log(response);
- * }).catch((error)=>{
- *  // console.error(error);
+ * refreshAccessToken().then((response) => {
+ *     console.log(response);
+ * }).catch((error) => {
+ *     console.error(error);
  * });
  * ```
- *
- * 
  */
 export const refreshAccessToken = async (): Promise<TokenResponse> => {
+
     const data = auth.getDataLayer();
-    const  _authenticationHelper = new AuthenticationHelper(data);
+    const _authenticationHelper = new AuthenticationHelper(data);
     const tokenEndpoint = (await data.getOIDCProviderMetaData()).token_endpoint;
     const configData = await auth.getDataLayer().getConfigData();
     const sessionData = await data.getSessionData();
-        
+
     if (!sessionData.refresh_token) {
         return Promise.reject(
             new AsgardeoAuthException(
@@ -234,7 +231,7 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
             )
         );
     }
-        
+
     if (!tokenEndpoint || tokenEndpoint.trim().length === 0) {
         return Promise.reject(
             new AsgardeoAuthException(
@@ -247,60 +244,60 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
             )
         );
     }
-        
+
     const body: string[] = [];
-    body.push(`client_id=${configData.clientID}`)
-    body.push(`refresh_token=${sessionData.refresh_token}`)
-    body.push("grant_type=refresh_token")
+    body.push(`client_id=${configData.clientID}`);
+    body.push(`refresh_token=${sessionData.refresh_token}`);
+    body.push("grant_type=refresh_token");
 
     if (configData.clientSecret && configData.clientSecret.trim().length > 0) {
-        body.push(`client_secret=${configData.clientSecret}`)
+        body.push(`client_secret=${configData.clientSecret}`);
     }
-        
-    return fetch(tokenEndpoint+"?", {
+
+    return fetch(tokenEndpoint + "?", {
         method: 'POST',
         disableAllSecurity: true,
         sslPinning: {
-        certs: ["wso2carbon"], // TODO: make the certificate name configurable
+            certs: ["wso2carbon"], // TODO: make the certificate name configurable
         },
         headers: {
-        Accept: `application/json`,
-        "Content-Type": "application/x-www-form-urlencoded"
+            Accept: `application/json`,
+            "Content-Type": "application/x-www-form-urlencoded"
         },
         body: body.join("&")
     })
-    .then((response) => { 
-            return _authenticationHelper
-                .handleTokenResponse(response)
-                .then((response: TokenResponse) => response)
-                .catch((error) => {
-                    return Promise.reject(
-                        new AsgardeoAuthException(
-                            "AUTH_CORE-RAT2-ES03",
-                            "authentication-core",
-                            "refreshAccessToken",
-                            null,
-                            null,
-                            error
-                        )
-                    );
-                });
+    .then((response) => {
+        return _authenticationHelper
+            .handleTokenResponse(response)
+            .then((response: TokenResponse) => response)
+            .catch((error) => {
+                return Promise.reject(
+                    new AsgardeoAuthException(
+                        "AUTH_CORE-RAT2-ES03",
+                        "authentication-core",
+                        "refreshAccessToken",
+                        null,
+                        null,
+                        error
+                    )
+                );
+            });
     })
     .catch((error) => {
-            return Promise.reject(
-                new AsgardeoAuthNetworkException(
-                    "AUTH_CORE-RAT2-NR03",
-                    "authentication-core",
-                    "refreshAccessToken",
-                    "Refresh access token request failed.",
-                    "The request to refresh the access token failed.",
-                    error?.code,
-                    error?.message,
-                    error?.response?.status,
-                    error?.response?.data
-                )
-            );
-        });
+        return Promise.reject(
+            new AsgardeoAuthNetworkException(
+                "AUTH_CORE-RAT2-NR03",
+                "authentication-core",
+                "refreshAccessToken",
+                "Refresh access token request failed.",
+                "The request to refresh the access token failed.",
+                error?.code,
+                error?.message,
+                error?.response?.status,
+                error?.response?.data
+            )
+        );
+    });
 }
 
 /**
@@ -314,12 +311,12 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
  * ```
  * const signOutUrl = await getSignOutURL();
  * ```
- *
  */
-export const getSignOutURL = async () => { 
+export const getSignOutURL = async () => {
+
     return await auth.getSignOutURL();
 }
-          
+
 /**
  * This method clears all authentication data and returns the sign-out URL.
  *
@@ -330,9 +327,9 @@ export const getSignOutURL = async () => {
  * ```
  * _signOut = SignOut(url);
  * ```
- *
  */
 export const SignOut = (Url) => {
+
     const data_list = url.parse(Url.url).query.split('&')
     const state =data_list[0].split('=')[1]
 
@@ -344,7 +341,7 @@ export const SignOut = (Url) => {
     } else {
         return false;
     }
-}   
+}
 
 /**
  * This method returns OIDC service endpoints that are fetched from the `.well-known` endpoint.
@@ -355,15 +352,13 @@ export const SignOut = (Url) => {
  * ```
  * const endpoints = await getOIDCServiceEndpoints();
  * ```
- *
  */
 export const getOIDCServiceEndpoints = async() => {
+
     return await auth.getOIDCServiceEndpoints();
 }
 
-/** 
- * TODO: Remove the following method and reuse the getDecodedIDToken method from auth-js sdk ones the crytoUtils are exposed from it.
- * 
+/**
  * This method decodes the payload of the ID token and returns it.
  *
  * @return {Promise<DecodedIDTokenPayload>} - A Promise that resolves with the decoded ID token payload.
@@ -375,9 +370,8 @@ export const getOIDCServiceEndpoints = async() => {
  *
  */
 export const getDecodedIDToken = async() => {
-    const idToken = (await auth.getDataLayer().getSessionData()).id_token;
-    const payload: DecodedIDTokenPayload = CryptoUtils.decodeIDToken(idToken);  
-    return payload;
+
+    return await auth.getDecodedIDToken();
 }
 
 /**
@@ -389,10 +383,9 @@ export const getDecodedIDToken = async() => {
  * ```
  * const userInfo = await userInfomation();
  * ```
- *
- * 
  */
 export const userInformation = async () => {
+
     return await auth.getBasicUserInfo();
 }
 
@@ -406,15 +399,16 @@ export const userInformation = async () => {
  * @example
  * ```
  * revokeAccessToken().then((response)=>{
- *  // console.log(response);
+ *     console.log(response);
  * }).catch((error)=>{
- *  // console.error(error);
+ *     console.error(error);
  * });
  * ```
  */
 export const revokeAccessToken = async () => {
+
     const data = auth.getDataLayer();
-    const  _authenticationHelper = new AuthenticationHelper(data);
+    const _authenticationHelper = new AuthenticationHelper(data);
     const revokeTokenEndpoint = (await data.getOIDCProviderMetaData()).revocation_endpoint;
     const configData = await auth.getDataLayer().getConfigData();
 
@@ -432,56 +426,56 @@ export const revokeAccessToken = async () => {
     }
 
     const body: string[] = [];
-    body.push(`client_id=${configData.clientID}`)
-    body.push(`token=${(await data.getSessionData()).access_token}`)
-    body.push("token_type_hint=access_token")
+    body.push(`client_id=${configData.clientID}`);
+    body.push(`token=${(await data.getSessionData()).access_token}`);
+    body.push("token_type_hint=access_token");
 
-    return fetch(revokeTokenEndpoint+"?", {
+    return fetch(revokeTokenEndpoint + "?", {
         method: 'POST',
         disableAllSecurity: true,
         sslPinning: {
-        certs: ["wso2carbon"], // TODO: make the certificate name configurable
+            certs: ["wso2carbon"], // TODO: make the certificate name configurable
         },
         headers: {
-        Accept: `application/json`,
-        "Content-Type": "application/x-www-form-urlencoded"
+            Accept: `application/json`,
+            "Content-Type": "application/x-www-form-urlencoded"
         },
         body: body.join("&")
     })
     .then((response) => {
-            if (response.status !== 200) {
-                return Promise.reject(
-                    new AsgardeoAuthException(
-                        "AUTH_CORE-RAT3-NR02",
-                        "authentication-core",
-                        "revokeAccessToken",
-                        "Invalid response status received for revoke access token request.",
-                        "The request sent to revoke the access token returned " +
-                            response.status +
-                            " , which is invalid."
-                    )
-                );
-            }
-
-            _authenticationHelper.clearUserSessionData();
-
-            return Promise.resolve(response);
-        })
-        .catch((error) => {
+        if (response.status !== 200) {
             return Promise.reject(
-                new AsgardeoAuthNetworkException(
-                    "AUTH_CORE-RAT3-NR03",
+                new AsgardeoAuthException(
+                    "AUTH_CORE-RAT3-NR02",
                     "authentication-core",
                     "revokeAccessToken",
-                    "The request to revoke access token failed.",
-                    "The request sent to revoke the access token failed.",
-                    error?.code,
-                    error?.message,
-                    error?.response?.status,
-                    error?.response?.data
+                    "Invalid response status received for revoke access token request.",
+                    "The request sent to revoke the access token returned " +
+                        response.status +
+                        " , which is invalid."
                 )
             );
-        });
+        }
+
+        _authenticationHelper.clearUserSessionData();
+
+        return Promise.resolve(response);
+    })
+    .catch((error) => {
+        return Promise.reject(
+            new AsgardeoAuthNetworkException(
+                "AUTH_CORE-RAT3-NR03",
+                "authentication-core",
+                "revokeAccessToken",
+                "The request to revoke access token failed.",
+                "The request sent to revoke the access token failed.",
+                error?.code,
+                error?.message,
+                error?.response?.status,
+                error?.response?.data
+            )
+        );
+    });
 }
 
 /**
@@ -493,12 +487,12 @@ export const revokeAccessToken = async () => {
  * ```
  * const accessToken = await getAccessToken();
  * ```
- *
  */
 export const getAccessToken = async () => {
+
     return await auth.getAccessToken();
 }
-    
+
 /**
  * This method returns if the user is authenticated or not.
  *
@@ -508,9 +502,9 @@ export const getAccessToken = async () => {
  * ```
  * await isAuthenticated();
  * ```
- *
  */
 export const isAuthenticated = async () => {
+
     return await auth.isAuthenticated();
 }
 
@@ -523,9 +517,9 @@ export const isAuthenticated = async () => {
  * ```
  * const pkce = await getPKCECode();
  * ```
- *
  */
 export const getPKCECode = async () => {
+
     return await auth.getPKCECode();
 }
 
@@ -538,8 +532,8 @@ export const getPKCECode = async () => {
  * ```
  * await setPKCECode("pkce_code")
  * ```
- *
  */
 export const setPKCECode = async (pkce:string) => {
-    return await auth.setPKCECode(pkce)
+
+    return await auth.setPKCECode(pkce);
 }

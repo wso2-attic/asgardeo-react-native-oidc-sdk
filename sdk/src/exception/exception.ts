@@ -19,6 +19,7 @@
 import { AsgardeoAuthNetworkException } from ".";
 
 export class AsgardeoAuthException extends Error {
+
     public name: string;
     public code: string;
     public file: string;
@@ -34,6 +35,7 @@ export class AsgardeoAuthException extends Error {
         description?: string,
         error?: AsgardeoAuthException | AsgardeoAuthNetworkException
     ) {
+
         super(message ?? error?.message);
         this.name = this.constructor.name;
         this.code = code;

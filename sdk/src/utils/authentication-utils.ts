@@ -20,10 +20,12 @@ import { AuthenticatedUserInfo, DecodedIDTokenPayload, TokenRequestHeader } from
 import { CryptoUtils } from "../utils";
 
 export class AuthenticationUtils {
+
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     private constructor() {}
-    
+
     public static getAuthenticatedUserInfo(idToken: string): AuthenticatedUserInfo {
+
         const payload: DecodedIDTokenPayload = CryptoUtils.decodeIDToken(idToken);
         const emailAddress: string = payload.email ? payload.email : null;
         const tenantDomain: string = this.getTenantDomainFromIdTokenPayload(payload);
@@ -40,6 +42,7 @@ export class AuthenticationUtils {
         payload: DecodedIDTokenPayload,
         uidSeparator: string = "@"
     ): string => {
+
         // If the `tenant_domain` claim is available in the ID token payload, give precedence.
         if (payload.tenant_domain) {
             return payload.tenant_domain;
@@ -53,6 +56,7 @@ export class AuthenticationUtils {
     };
 
     public static getTokenRequestHeaders(): TokenRequestHeader {
+
         return {
             Accept: "application/json",
             "Content-Type": "application/x-www-form-urlencoded"
