@@ -25,11 +25,11 @@ import {
   getDecodedIDToken,
   getAccessToken
 } from '@asgardeo/auth-react-native';
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Image, Text, Button, Linking, ActivityIndicator } from 'react-native';
 import url from 'url';
 import { styles } from '../components/styles';
-import { loginState, updateLoginState } from '../data/state';
+import { LoginContext } from '../context/LoginContext';
 
 // Create a config object containing the necessary configurations.
 // For emulator.
@@ -48,33 +48,32 @@ const Config = {
 //    SignOutURL: "http://192.168.43.29:8081"
 //  };
 
-class LoginScreen extends React.Component {
+const LoginScreen = (props) => {
 
-  constructor(props) {
+  const loginContext = useContext(LoginContext);
+  [loading, setLoading] = useState(false);
 
-    super(props);
-    this.state = {
-      loading: false
-    };
-
-    // Initializes the SDK with the config data.
+  /**
+   * This hook will initialize the config object and registers the url listener.
+   */
+  useEffect(() => {
     initialize(Config);
-  }
+    Linking.addEventListener('url', handleAuthUrl);
 
-  componentDidMount() {
+    return () => {
+      Linking.removeEventListener('url', handleAuthUrl);
+    }
+  }, []);
 
-    Linking.addEventListener('url', this.handleAuthUrl);
-  }
-
-  componentWillUnmount() {
-
-    Linking.removeEventListener('url', this.handleAuthUrl);
-  }
-
-  handleAuthUrl = async (Url) => {
+  /**
+   * This function will listen for browser redirections and proceed the login.
+   * 
+   * @param Url - Redirect url object.
+   */
+  const handleAuthUrl = async (Url) => {
 
     if (url.parse(Url.url).query.indexOf("code=") > -1) {
-      this.setState({ loading: true });
+      setLoading(true);
 
       // Get param of authorization url and return token details.
       requestAccessTokenDetails(Url)
@@ -84,14 +83,14 @@ class LoginScreen extends React.Component {
            */
           await getAccessToken();
 
-          updateLoginState({  ...token, haslogin: true });
-
+          // Obtain the user information.
           userInformation().then((user) => {
-            updateLoginState(user);
+            // Get the decoded id token fields.
             getDecodedIDToken().then((decodeID) => {
-              updateLoginState(decodeID);
-              this.setState({ loading: false });
-              this.props.navigation.navigate('SignIn');
+              loginContext.setLoginState({ ...loginContext.loginState, ...token, ...user, ...decodeID, 
+                haslogin: true });
+              setLoading(false);
+              props.navigation.navigate('HomeScreen');
             })
             .catch((error) => {
               console.log(error);
@@ -107,96 +106,98 @@ class LoginScreen extends React.Component {
     }
   };
 
-  handleSubmitPress = async () => {
+  /**
+   * This function will be triggered upon login button click. Will check the login state and proceed 
+   * with the login steps.
+   */
+  const handleSubmitPress = async () => {
 
     // Authenticate with Identity server.
     getAuthorizationURL()
       .then((url) => {
-        if (loginState.haslogin === false) {
+        if (loginContext.loginState.haslogin === false) {
           // Linking the AuthorizeUrl through the internet.
           Linking.openURL(url);
         } else {
-          this.setState({ loading: true });
+          setLoading(true);
           
+          // Obtain the user information.
           userInformation().then((user) => {
-            updateLoginState(user);
+            // Get the decoded id token fields.
             getDecodedIDToken().then((decodeID) => {
-              updateLoginState(decodeID);
-              this.setState({ loading: false });
-              this.props.navigation.navigate('SignIn');
+              loginContext.setLoginState({ ...loginContext.loginState, ...user, ...decodeID });
+              setLoading(false);
+              props.navigation.navigate('HomeScreen');
             })
             .catch((error) => {
-              this.setState({ loading: false });
+              setLoading(false);
               console.log(error);
             });
           })
           .catch((error) => {
-            this.setState({ loading: false });
+            setLoading(false);
             console.log(error);
           });
         }
       })
       .catch((error) => {
-        this.setState({ loading: false });
+        setLoading(false);
         console.error(error);
       });
   };
 
-  render() {
-
-    return (
-      <View style = { styles.mainBody }>
-        <View>
-          <View style = { styles.container }>
-            <View>
-              <Text style = { styles.text }>
-                React Native Authentication Sample{' '}
-              </Text>
-            </View>
-            <View style = { styles.imageAlign }>
-              <Image
-                source = { require('../assets/login.jpg') }
-                style = { styles.image }
-              />
-              <Text style = { styles.textpara }>
-                Sample demo to showcase authentication for a React Native via
-                the OpenID Connect Authorization Code flow, which is integrated
-                using the{' '}
-                <Text
-                  style = { styles.TextStyle }
-                  onPress = { () =>
-                    Linking.openURL('https://github.com/asgardeo/asgardeo-react-native-oidc-sdk')
-                  }>
-                  Asgardeo Auth React Native SDK
-                </Text>
-                .
-              </Text>
-            </View>
-            <View style = { styles.button }>
-              <Button
-                color = "#282c34"
-                onPress = { this.handleSubmitPress }
-                title = "Login"
-              />
-            </View>
-            {
-              this.state.loading ? 
-              <View style={ styles.loading } pointerEvents="none">
-                <ActivityIndicator size="large" color="#FF8000" />
-              </View> : null
-            }
+  return (
+    <View style = { styles.mainBody }>
+      <View>
+        <View style = { styles.container }>
+          <View>
+            <Text style = { styles.text }>
+              React Native Authentication Sample{' '}
+            </Text>
           </View>
-
-          <View style = { styles.footer }>
+          <View style = { styles.imageAlign }>
             <Image
-              source = { require('../assets/footer.png') }
-              style = { styles.footerAlign }
+              source = { require('../assets/login.jpg') }
+              style = { styles.image }
+            />
+            <Text style = { styles.textpara }>
+              Sample demo to showcase authentication for a React Native via
+              the OpenID Connect Authorization Code flow, which is integrated
+              using the{' '}
+              <Text
+                style = { styles.TextStyle }
+                onPress = { () =>
+                  Linking.openURL('https://github.com/asgardeo/asgardeo-react-native-oidc-sdk')
+                }>
+                Asgardeo Auth React Native SDK
+              </Text>
+              .
+            </Text>
+          </View>
+          <View style = { styles.button }>
+            <Button
+              color = "#282c34"
+              onPress = { handleSubmitPress }
+              title = "Login"
             />
           </View>
+          {
+            loading ? 
+            <View style={ styles.loading } pointerEvents="none">
+              <ActivityIndicator size="large" color="#FF8000" />
+            </View> : null
+          }
+        </View>
+
+        <View style = { styles.footer }>
+          <Image
+            source = { require('../assets/footer.png') }
+            style = { styles.footerAlign }
+          />
         </View>
       </View>
-    );
-  }
+    </View>
+  );
 }
 
 export default LoginScreen;

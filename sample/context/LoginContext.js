@@ -16,7 +16,9 @@
  * under the License.
  */
 
-export var loginState = {
+import React, { useState } from 'react';
+
+const initialState = {
     accessToken: '',
     refreshToken: '',
     idToken: '',
@@ -36,30 +38,21 @@ export var loginState = {
     sub: ''
 };
 
-export const updateLoginState = (updatedState) => {
-    loginState = {
-        ...loginState, ...updatedState
-    };
-};
+const LoginContext = React.createContext();
 
-export const clearLoginState = () => {
-    loginState = {
-        accessToken: '',
-        refreshToken: '',
-        idToken: '',
-        haslogin: false,
-        allowedScopes: '',
-        username: '',
-        sessionState: '',
-        amr: '',
-        at_hash: '',
-        aud: '',
-        azp: '',
-        c_hash: '',
-        exp: '',
-        iat: '',
-        iss: '',
-        nbf: '',
-        sub: ''
-    }
-};
+const LoginContextProvider = (props) => {
+    const [loginState, setLoginState] = useState(initialState);
+
+    return (
+        <LoginContext.Provider
+            value = {{
+                loginState,
+                setLoginState
+            }}
+        >
+            {props.children}
+        </LoginContext.Provider>
+    )
+}
+
+export { initialState, LoginContext, LoginContextProvider };
