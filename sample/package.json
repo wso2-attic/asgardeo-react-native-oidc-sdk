@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@asgardeo/auth-js": "^0.2.0",
-    "@asgardeo/auth-react-native": "file:../asgardeo-auth-react-native-0.0.1.tgz",
+    "@asgardeo/auth-react-native": "file:../sdk/asgardeo-auth-react-native-0.0.1.tgz",
     "@react-native-async-storage/async-storage": "^1.13.2",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.9.0",
