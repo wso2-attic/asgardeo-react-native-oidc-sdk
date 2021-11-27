@@ -80,7 +80,9 @@ sections listed below.
 
 2. Open the cloned project directory via code editors.
 
-3. Add the relevant configs in LoginScreen file located in `Screen/LoginScreen` folder.
+3. Inside sdk install the dependencies and generate the tar file running `npm pack`
+
+4. Add the relevant configs in LoginScreen file located in `Screen/LoginScreen` folder.
 
    - Replace the value of `client-id` with the value of `OAuth Client Key` property which you copied in the step 3 when
      [configuring the Identity Server](#configuring-the-identity-server).
