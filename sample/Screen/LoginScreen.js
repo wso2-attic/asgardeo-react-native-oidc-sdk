@@ -93,14 +93,17 @@ const LoginScreen = (props) => {
               props.navigation.navigate('HomeScreen');
             })
             .catch((error) => {
+              setLoading(false);
               console.log(error);
             });
           })
           .catch((error) => {
+            setLoading(false);
             console.log(error);
           });
         })
         .catch((error) => {
+          setLoading(false);
           console.log(error);
         });
     }
