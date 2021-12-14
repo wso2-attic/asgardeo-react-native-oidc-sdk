@@ -20,16 +20,12 @@ import Base64 from "crypto-js/enc-base64";
 import utf8 from "crypto-js/enc-utf8";
 import WordArray from "crypto-js/lib-typedarrays";
 import sha256 from "crypto-js/sha256";
-// Importing from node_modules since rollup doesn't support export attribute of `package.json` yet.
-import parseJwk from "../../../../jose/dist/browser/jwk/parse";
-import jwtVerify, { KeyLike } from "../../../../jose/dist/browser/jwt/verify";
-import { AsgardeoAuthException } from "../exception";
-import { DecodedIDTokenPayload, JWKInterface } from "@asgardeo/auth-js";
+import { AsgardeoAuthException } from "@asgardeo/auth-js/src/exception";
+import { DecodedIDTokenPayload, JWKInterface, SUPPORTED_SIGNATURE_ALGORITHMS } from "@asgardeo/auth-js";
+import { decode as atob } from "base-64";
+import { KEYUTIL, KJUR } from "jsrsasign";
 
 export class CryptoUtils {
-
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    private constructor() {}
 
     /**
      * Get URL encoded string.
@@ -37,7 +33,7 @@ export class CryptoUtils {
      * @param {CryptoJS.WordArray} value.
      * @returns {string} base 64 url encoded value.
      */
-    public static base64URLEncode(value: CryptoJS.WordArray): string {
+    public base64URLEncode(value: CryptoJS.WordArray): string {
 
         return Base64.stringify(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
     }
@@ -47,7 +43,7 @@ export class CryptoUtils {
      *
      * @returns {string} code verifier.
      */
-    public static getCodeVerifier(): string {
+    public getCodeVerifier(): string {
 
         return this.base64URLEncode(WordArray.random(32));
     }
@@ -58,19 +54,9 @@ export class CryptoUtils {
      * @param {string} verifier.
      * @returns {string} code challenge.
      */
-    public static getCodeChallenge(verifier: string): string {
+    public getCodeChallenge(verifier: string): string {
 
         return this.base64URLEncode(sha256(verifier));
-    }
-
-    /**
-     * Get the supported signing algorithms for the id_token.
-     *
-     * @returns {string[]} array of supported algorithms.
-     */
-    public static getSupportedSignatureAlgorithms(): string[] {
-
-        return ["RS256", "RS512", "RS384", "PS256"];
     }
 
     /**
@@ -81,18 +67,24 @@ export class CryptoUtils {
      * @returns {any} public key.
      */
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    public static getJWKForTheIdToken(jwtHeader: string, keys: JWKInterface[]): Promise<KeyLike> {
+    public async getJWKForTheIdToken(jwtHeader: string, keys: JWKInterface[]): Promise<any> {
 
         const headerJSON = JSON.parse(atob(jwtHeader));
 
         for (const key of keys) {
             if (headerJSON.kid === key.kid) {
-                return parseJwk({
-                    alg: key.alg,
-                    e: key.e,
-                    kty: key.kty,
-                    n: key.n
-                });
+                try {
+                    const jwk = KEYUTIL.getKey({
+                        alg: key.alg,
+                        e: key.e,
+                        kty: key.kty,
+                        n: key.n
+                    });
+
+                    return Promise.resolve(jwk);
+                } catch(error) {
+                    return Promise.reject(error);
+                }
             }
         }
 
@@ -121,36 +113,23 @@ export class CryptoUtils {
      * @param {number} clockTolerance - Allowed leeway for id_tokens (in seconds).
      * @returns {Promise<boolean>} whether the id_token is valid.
      */
-    public static isValidIdToken(
+    public isValidIdToken(
         idToken: string,
-        jwk: KeyLike,
+        jwk: any,
         clientID: string,
         issuer: string,
         username: string,
         clockTolerance: number
     ): Promise<boolean> {
+        const verification = KJUR.jws.JWS.verifyJWT(idToken, jwk, {
+            alg: SUPPORTED_SIGNATURE_ALGORITHMS,
+            aud: clientID,
+            iss: [issuer],
+            sub: username,
+            gracePeriod: clockTolerance
+        });
 
-        return jwtVerify(idToken, jwk, {
-                algorithms: this.getSupportedSignatureAlgorithms(),
-                audience: clientID,
-                clockTolerance: clockTolerance,
-                issuer: issuer,
-                subject: username
-            })
-            .then(() => {
-                return Promise.resolve(true);
-            })
-            .catch((error) => {
-                return Promise.reject(
-                    new AsgardeoAuthException(
-                        "CRYPTO_UTIL-IVIT-IV02",
-                        "crypto-utils",
-                        "isValidIdToken",
-                        "Validating ID token failed",
-                        error
-                    )
-                );
-            });
+        return Promise.resolve(verification);
     }
 
     /**
@@ -160,7 +139,7 @@ export class CryptoUtils {
      *
      * @return {DecodedIdTokenPayloadInterface} - The decoded payload of the id token.
      */
-    public static decodeIDToken(idToken: string): DecodedIDTokenPayload {
+    public decodeIDToken(idToken: string): DecodedIDTokenPayload {
 
         try {
             const words = Base64.parse(idToken.split(".")[1]);

@@ -16,18 +16,10 @@
  * under the License.
  */
 
-import { auth } from './store';
+import { auth } from './wrapper';
 import {
     TokenResponse,
-    SESSION_STATE,
-    PKCE_CODE_VERIFIER,
   } from '@asgardeo/auth-js';
-import { 
-    AsgardeoAuthException,
-    AsgardeoAuthNetworkException,
- } from './exception'
-import { AuthenticationHelper } from './authentication-helper';
-import { fetch } from 'react-native-ssl-pinning';
 import url from 'url';
 
 /**
@@ -101,99 +93,14 @@ export const getAuthorizationURL = async (config):Promise<String> => {
  * });
  * ```
  */
-export const requestAccessTokenDetails = (Authurl) => {
+export const requestAccessTokenDetails = async (Authurl) => {
 
     const urlObject = url.parse(Authurl.url);
     const data_list = urlObject.query.split('&');
     const code = data_list[0].split('=')[1];
     const session_state = data_list[1].split('=')[1];
 
-    return requestAccessToken(code,session_state);
-}
-
-const requestAccessToken = async (authorizationCode, sessionState) : Promise<TokenResponse> => {
-
-    const data = auth.getDataLayer();
-    const _authenticationHelper = new AuthenticationHelper(data);
-    const tokenEndpoint = (await data.getOIDCProviderMetaData()).token_endpoint;
-    const configData = await auth.getDataLayer().getConfigData();
-
-    if (!tokenEndpoint || tokenEndpoint.trim().length === 0) {
-        return Promise.reject(
-            new AsgardeoAuthException(
-                "AUTH_CORE-RAT1-NF01",
-                "authentication-core",
-                "requestAccessToken",
-                "Token endpoint not found.",
-                "No token endpoint was found in the OIDC provider meta data returned by the well-known endpoint " + 
-                "or the token endpoint passed to the SDK is empty."
-                )
-            );
-        }
-
-    await data.setSessionDataParameter(SESSION_STATE, sessionState);
-
-    const body: string[] = [];
-    body.push(`client_id=${configData.clientID}`);
-
-    if (configData.clientSecret && configData.clientSecret.trim().length > 0) {
-        body.push(`client_secret=${configData.clientSecret}`);
-    }
-
-    const code = authorizationCode;
-    body.push(`code=${code}`);
-    body.push("grant_type=authorization_code");
-    body.push(`redirect_uri=${configData.signInRedirectURL}`);
-
-    if (configData.enablePKCE) {
-        body.push(`code_verifier=${await data.getTemporaryDataParameter(PKCE_CODE_VERIFIER)}`);
-        await data.removeTemporaryDataParameter(PKCE_CODE_VERIFIER);
-    }
-
-    return fetch(tokenEndpoint + "?", {
-        method: 'POST',
-        disableAllSecurity: true,
-        sslPinning: {
-            certs: ["wso2carbon"], // TODO: make the certificate name configurable
-        },
-        headers: {
-            Accept: `application/json`,
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: body.join("&")
-    })
-    .then(response => {
-        return _authenticationHelper
-            .handleTokenResponse(response)
-            .then((response: TokenResponse) => response)
-            .catch((error) => {
-                return Promise.reject(
-                    new AsgardeoAuthException(
-                        "AUTH_CORE-RAT1-ES02",
-                        "authentication-core",
-                        "requestAccessToken",
-                        null,
-                        null,
-                        error
-                    )
-                );
-            });
-    })
-    .catch((error) => {
-        return Promise.reject(
-            new AsgardeoAuthNetworkException(
-                "AUTH_CORE-RAT1-NR03",
-                "authentication-core",
-                "requestAccessToken",
-                "Requesting access token failed",
-                "The request to get the access token from the server failed.",
-                error?.code,
-                error?.message,
-                error?.response?.status,
-                error?.response?.data
-            )
-        );
-    });
+    return await auth.requestAccessToken(code, session_state);
 }
 
 /**
@@ -213,91 +120,7 @@ const requestAccessToken = async (authorizationCode, sessionState) : Promise<Tok
  */
 export const refreshAccessToken = async (): Promise<TokenResponse> => {
 
-    const data = auth.getDataLayer();
-    const _authenticationHelper = new AuthenticationHelper(data);
-    const tokenEndpoint = (await data.getOIDCProviderMetaData()).token_endpoint;
-    const configData = await auth.getDataLayer().getConfigData();
-    const sessionData = await data.getSessionData();
-
-    if (!sessionData.refresh_token) {
-        return Promise.reject(
-            new AsgardeoAuthException(
-                "AUTH_CORE-RAT2-NF01",
-                "authentication-core",
-                "refreshAccessToken",
-                "No refresh token found.",
-                "There was no refresh token found. The identity server doesn't return a " +
-                "refresh token if the refresh token grant is not enabled."
-            )
-        );
-    }
-
-    if (!tokenEndpoint || tokenEndpoint.trim().length === 0) {
-        return Promise.reject(
-            new AsgardeoAuthException(
-                "AUTH_CORE-RAT2-NF02",
-                "authentication-core",
-                "refreshAccessToken",
-                "No refresh token endpoint found.",
-                "No refresh token endpoint was in the OIDC provider meta data returned by the well-known " +
-                "endpoint or the refresh token endpoint passed to the SDK is empty."
-            )
-        );
-    }
-
-    const body: string[] = [];
-    body.push(`client_id=${configData.clientID}`);
-    body.push(`refresh_token=${sessionData.refresh_token}`);
-    body.push("grant_type=refresh_token");
-
-    if (configData.clientSecret && configData.clientSecret.trim().length > 0) {
-        body.push(`client_secret=${configData.clientSecret}`);
-    }
-
-    return fetch(tokenEndpoint + "?", {
-        method: 'POST',
-        disableAllSecurity: true,
-        sslPinning: {
-            certs: ["wso2carbon"], // TODO: make the certificate name configurable
-        },
-        headers: {
-            Accept: `application/json`,
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: body.join("&")
-    })
-    .then((response) => {
-        return _authenticationHelper
-            .handleTokenResponse(response)
-            .then((response: TokenResponse) => response)
-            .catch((error) => {
-                return Promise.reject(
-                    new AsgardeoAuthException(
-                        "AUTH_CORE-RAT2-ES03",
-                        "authentication-core",
-                        "refreshAccessToken",
-                        null,
-                        null,
-                        error
-                    )
-                );
-            });
-    })
-    .catch((error) => {
-        return Promise.reject(
-            new AsgardeoAuthNetworkException(
-                "AUTH_CORE-RAT2-NR03",
-                "authentication-core",
-                "refreshAccessToken",
-                "Refresh access token request failed.",
-                "The request to refresh the access token failed.",
-                error?.code,
-                error?.message,
-                error?.response?.status,
-                error?.response?.data
-            )
-        );
-    });
+    return await auth.refreshAccessToken();
 }
 
 /**
@@ -407,75 +230,7 @@ export const userInformation = async () => {
  */
 export const revokeAccessToken = async () => {
 
-    const data = auth.getDataLayer();
-    const _authenticationHelper = new AuthenticationHelper(data);
-    const revokeTokenEndpoint = (await data.getOIDCProviderMetaData()).revocation_endpoint;
-    const configData = await auth.getDataLayer().getConfigData();
-
-    if (!revokeTokenEndpoint || revokeTokenEndpoint.trim().length === 0) {
-        return Promise.reject(
-            new AsgardeoAuthException(
-                "AUTH_CORE-RAT3-NF01",
-                "authentication-core",
-                "revokeAccessToken",
-                "No revoke access token endpoint found.",
-                "No revoke access token endpoint was found in the OIDC provider meta data returned by " +
-                    "the well-known endpoint or the revoke access token endpoint passed to the SDK is empty."
-            )
-        );
-    }
-
-    const body: string[] = [];
-    body.push(`client_id=${configData.clientID}`);
-    body.push(`token=${(await data.getSessionData()).access_token}`);
-    body.push("token_type_hint=access_token");
-
-    return fetch(revokeTokenEndpoint + "?", {
-        method: 'POST',
-        disableAllSecurity: true,
-        sslPinning: {
-            certs: ["wso2carbon"], // TODO: make the certificate name configurable
-        },
-        headers: {
-            Accept: `application/json`,
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: body.join("&")
-    })
-    .then((response) => {
-        if (response.status !== 200) {
-            return Promise.reject(
-                new AsgardeoAuthException(
-                    "AUTH_CORE-RAT3-NR02",
-                    "authentication-core",
-                    "revokeAccessToken",
-                    "Invalid response status received for revoke access token request.",
-                    "The request sent to revoke the access token returned " +
-                        response.status +
-                        " , which is invalid."
-                )
-            );
-        }
-
-        _authenticationHelper.clearUserSessionData();
-
-        return Promise.resolve(response);
-    })
-    .catch((error) => {
-        return Promise.reject(
-            new AsgardeoAuthNetworkException(
-                "AUTH_CORE-RAT3-NR03",
-                "authentication-core",
-                "revokeAccessToken",
-                "The request to revoke access token failed.",
-                "The request sent to revoke the access token failed.",
-                error?.code,
-                error?.message,
-                error?.response?.status,
-                error?.response?.data
-            )
-        );
-    });
+    return await auth.revokeAccessToken();
 }
 
 /**
