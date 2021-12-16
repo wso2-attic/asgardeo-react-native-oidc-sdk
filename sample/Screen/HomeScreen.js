@@ -121,10 +121,6 @@ const HomeScreen = (props) => {
           <Text style = { styles.flexheading }>Refresh token</Text>
           <Text style = { styles.reftoke }>{ loginContext.loginState.refreshToken }</Text>
         </View>
-        <View>
-          <Text style = { styles.flexheading }>Access token</Text>
-          <Text style = { styles.reftoke }>{ loginContext.loginState.accessToken }</Text>
-        </View>
       </View>
 
       <View style = { styles.flex }>
