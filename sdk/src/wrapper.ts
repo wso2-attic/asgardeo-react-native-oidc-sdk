@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,21 +18,21 @@
 
 import "text-encoding-polyfill";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AsgardeoAuthClient } from '@asgardeo/auth-js';
+import { AsgardeoAuthClient } from "@asgardeo/auth-js";
 import { CryptoUtils } from "./utils/crypto-utils";
 
 // Create a Store class to store the authentication data. The following implementation uses the async-storage.
 class LocalStorage {
 
     // Get the data from the store.
-    async getData(key:string) {
+    async getData(key: string) {
 
         const _value = await AsyncStorage.getItem(key);
         return _value;
     }
 
     // Save the data into the store.
-    async setData(key:string,value:string) {
+    async setData(key: string, value: string) {
 
         try {
             await AsyncStorage.setItem(key, value);
@@ -43,7 +43,7 @@ class LocalStorage {
     }
 
     // Remove the data from the store.
-    async removeData(key:string) {
+    async removeData(key: string) {
 
         try {
             await AsyncStorage.removeItem(key);

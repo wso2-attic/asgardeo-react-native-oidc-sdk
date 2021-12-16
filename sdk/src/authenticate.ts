@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,18 +16,25 @@
  * under the License.
  */
 
-import { auth } from './wrapper';
+import { auth } from "./wrapper";
 import {
-    TokenResponse,
-  } from '@asgardeo/auth-js';
-import url from 'url';
+  AuthClientConfig,
+  BasicUserInfo,
+  DataLayer,
+  DecodedIDTokenPayload,
+  OIDCEndpoints,
+  TokenResponse,
+} from "@asgardeo/auth-js";
+import url from "url";
 
 /**
  *
  * This method initializes the SDK with the config data.
  *
+ * @param config - Authentication config object.
+ *
  * @example
- * const Config ={
+ * const config = {
  *     serverOrigin:"https://10.0.2.2:9443",
  *     signInRedirectURL:"http://10.0.2.2:8081",
  *     clientID: "ClientID",
@@ -36,7 +43,7 @@ import url from 'url';
  *
  * initialize(config);
  */
-export const initialize = async(config):Promise<void> => {
+export const initialize = async (config: AuthClientConfig): Promise<void> => {
 
     await auth.initialize(config);
 }
@@ -44,14 +51,14 @@ export const initialize = async(config):Promise<void> => {
 /**
  * This method returns the `DataLayer` object that allows you to access authentication data.
  *
- * @return {DataLayer} - The `DataLayer` object.
+ * @return {Promise<DataLayer<any>>} - The `DataLayer` object.
  *
  * @example
  * ```
  * const data = await getDataLayer();
  * ```
  */
-export const getDataLayer = async () => {
+export const getDataLayer = async (): Promise<DataLayer<any>> => {
 
     return await auth.getDataLayer();
 }
@@ -63,14 +70,14 @@ export const getDataLayer = async () => {
  *
  * @example
  * ```
- * auth.getAuthorizationURL(Config).then((url) => {
- *     this.props.navigation.navigate("SignIn",{url:url,config:Config}) // navigate it to SignIn page
+ * auth.getAuthorizationURL(config).then((url) => {
+ *     this.props.navigation.navigate("SignIn", {url:url,config:Config})
  * }).catch((error) => {
  *     console.error(error);
  * });
  * ```
  */ 
-export const getAuthorizationURL = async (config):Promise<String> => { 
+export const getAuthorizationURL = async (config): Promise<string> => {
 
     return await auth.getAuthorizationURL(config);
 }
@@ -79,13 +86,13 @@ export const getAuthorizationURL = async (config):Promise<String> => {
  * This is an method that sends a request to obtain the access token and returns a Promise
  * that resolves with the token and other relevant data.
  *
- * @param Authurl - The authorization url.
+ * @param authUrl - The authorization url.
  *
  * @return {Promise<TokenResponse>} - A Promise that resolves with the token response.
  *
  * @example
  * ```
- * requestAccessTokenDetails(Authurl).then((token) => { // get param of authorization url and return token details
+ * requestAccessTokenDetails(authUrl).then((token) => {
  *     console.log("ReAccessToken", token);
  *     setAuthState({...token});
  * }).catch((error) => {
@@ -93,14 +100,14 @@ export const getAuthorizationURL = async (config):Promise<String> => {
  * });
  * ```
  */
-export const requestAccessTokenDetails = async (Authurl) => {
+export const requestAccessTokenDetails = async (authUrl): Promise<TokenResponse> => {
 
-    const urlObject = url.parse(Authurl.url);
-    const data_list = urlObject.query.split('&');
-    const code = data_list[0].split('=')[1];
-    const session_state = data_list[1].split('=')[1];
+    const urlObject = url.parse(authUrl.url);
+    const dataList = urlObject.query.split("&");
+    const code = dataList[0].split("=")[1];
+    const sessionState = dataList[1].split("=")[1];
 
-    return await auth.requestAccessToken(code, session_state);
+    return await auth.requestAccessToken(code, sessionState);
 }
 
 /**
@@ -135,7 +142,7 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
  * const signOutUrl = await getSignOutURL();
  * ```
  */
-export const getSignOutURL = async () => {
+export const getSignOutURL = async (): Promise<string> => {
 
     return await auth.getSignOutURL();
 }
@@ -143,23 +150,24 @@ export const getSignOutURL = async () => {
 /**
  * This method clears all authentication data and returns the sign-out URL.
  *
- * @param Url - The Signout Url it get from getSignoutUrl method.
+ * @param signOutUrl - The Signout url it get from getSignoutUrl method.
  * @return {Promise<string>} - A Promise that resolves with the sign-out URL.
  *
  * @example
  * ```
- * _signOut = SignOut(url);
+ * _signOut = signOut(url);
  * ```
  */
-export const SignOut = (Url) => {
+export const signOut = (signOutUrl) => {
 
-    const data_list = url.parse(Url.url).query.split('&')
-    const state =data_list[0].split('=')[1]
+    const dataList = url.parse(signOutUrl.url).query.split("&");
+    const state = dataList[0].split("=")[1];
 
-    if ( state == "sign_out_success" ) {
+    if (state === "sign_out_success") {
         auth.getDataLayer().removeOIDCProviderMetaData();
         auth.getDataLayer().removeTemporaryData();
         auth.getDataLayer().removeSessionData();
+
         return true;
     } else {
         return false;
@@ -176,7 +184,7 @@ export const SignOut = (Url) => {
  * const endpoints = await getOIDCServiceEndpoints();
  * ```
  */
-export const getOIDCServiceEndpoints = async() => {
+export const getOIDCServiceEndpoints = async (): Promise<OIDCEndpoints> => {
 
     return await auth.getOIDCServiceEndpoints();
 }
@@ -192,7 +200,7 @@ export const getOIDCServiceEndpoints = async() => {
  * ```
  *
  */
-export const getDecodedIDToken = async() => {
+export const getDecodedIDToken = async (): Promise<DecodedIDTokenPayload> => {
 
     return await auth.getDecodedIDToken();
 }
@@ -207,7 +215,7 @@ export const getDecodedIDToken = async() => {
  * const userInfo = await userInfomation();
  * ```
  */
-export const userInformation = async () => {
+export const userInformation = async (): Promise<BasicUserInfo> => {
 
     return await auth.getBasicUserInfo();
 }
@@ -217,7 +225,7 @@ export const userInformation = async () => {
  *
  * **This method also clears the authentication data.**
  *
- * @return {response}- A Promise that returns the response of the revoke-access-token request.
+ * @return {response} - A Promise that returns the response of the revoke-access-token request.
  *
  * @example
  * ```
@@ -228,7 +236,7 @@ export const userInformation = async () => {
  * });
  * ```
  */
-export const revokeAccessToken = async () => {
+export const revokeAccessToken = async (): Promise<any> => {
 
     return await auth.revokeAccessToken();
 }
@@ -243,7 +251,7 @@ export const revokeAccessToken = async () => {
  * const accessToken = await getAccessToken();
  * ```
  */
-export const getAccessToken = async () => {
+export const getAccessToken = async (): Promise<string> => {
 
     return await auth.getAccessToken();
 }
@@ -258,7 +266,7 @@ export const getAccessToken = async () => {
  * await isAuthenticated();
  * ```
  */
-export const isAuthenticated = async () => {
+export const isAuthenticated = async (): Promise<boolean> => {
 
     return await auth.isAuthenticated();
 }
@@ -273,7 +281,7 @@ export const isAuthenticated = async () => {
  * const pkce = await getPKCECode();
  * ```
  */
-export const getPKCECode = async () => {
+export const getPKCECode = async (): Promise<string> => {
 
     return await auth.getPKCECode();
 }
@@ -288,7 +296,7 @@ export const getPKCECode = async () => {
  * await setPKCECode("pkce_code")
  * ```
  */
-export const setPKCECode = async (pkce:string) => {
+export const setPKCECode = async (pkce: string): Promise<void> => {
 
     return await auth.setPKCECode(pkce);
 }

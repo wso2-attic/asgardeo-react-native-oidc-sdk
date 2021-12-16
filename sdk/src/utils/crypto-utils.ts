@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,7 +21,11 @@ import utf8 from "crypto-js/enc-utf8";
 import WordArray from "crypto-js/lib-typedarrays";
 import sha256 from "crypto-js/sha256";
 import { AsgardeoAuthException } from "@asgardeo/auth-js/src/exception";
-import { DecodedIDTokenPayload, JWKInterface, SUPPORTED_SIGNATURE_ALGORITHMS } from "@asgardeo/auth-js";
+import {
+  DecodedIDTokenPayload,
+  JWKInterface,
+  SUPPORTED_SIGNATURE_ALGORITHMS,
+} from "@asgardeo/auth-js";
 import { decode as atob } from "base-64";
 import { KEYUTIL, KJUR } from "jsrsasign";
 
