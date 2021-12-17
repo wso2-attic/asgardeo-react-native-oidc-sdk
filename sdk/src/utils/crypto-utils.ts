@@ -22,14 +22,15 @@ import WordArray from "crypto-js/lib-typedarrays";
 import sha256 from "crypto-js/sha256";
 import { AsgardeoAuthException } from "@asgardeo/auth-js/src/exception";
 import {
-  DecodedIDTokenPayload,
-  JWKInterface,
-  SUPPORTED_SIGNATURE_ALGORITHMS,
+    CryptoUtils,
+    DecodedIDTokenPayload,
+    JWKInterface,
+    SUPPORTED_SIGNATURE_ALGORITHMS,
 } from "@asgardeo/auth-js";
 import { decode as atob } from "base-64";
 import { KEYUTIL, KJUR } from "jsrsasign";
 
-export class CryptoUtils {
+export class ReactNativeCryptoUtils implements CryptoUtils {
 
     /**
      * Get URL encoded string.
@@ -87,21 +88,27 @@ export class CryptoUtils {
 
                     return Promise.resolve(jwk);
                 } catch(error) {
-                    return Promise.reject(error);
+                    return Promise.reject(
+                        new AsgardeoAuthException(
+                            "CRYPTO_UTIL-GTFTIT-NF01",
+                            "crypto-utils",
+                            "getJWKForTheIdToken",
+                            "Failed to retrive jwk.",
+                            error
+                        )
+                    );
                 }
             }
         }
 
         return Promise.reject(
             new AsgardeoAuthException(
-                "CRYPTO_UTIL-GTFTIT-IV01",
+                "CRYPTO_UTIL-GTFTIT-IV02",
                 "crypto-utils",
                 "getJWKForTheIdToken",
                 "kid not found.",
-                "Failed to find the 'kid' specified in the id_token. 'kid' found in the header : " +
-                    headerJSON.kid +
-                    ", Expected values: " +
-                    keys.map((key) => key.kid).join(", ")
+                "Failed to find the 'kid' specified in the id_token. 'kid' found in the header : " + headerJSON.kid +
+                    ", Expected values: " + keys.map((key) => key.kid).join(", ")
             )
         );
     }

@@ -15,6 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import{ initialize, getAuthorizationURL, requestAccessTokenDetails, refreshAccessToken, getAccessToken, getDataLayer, getDecodedIDToken, getOIDCServiceEndpoints, getSignOutURL, SignOut, userInformation, revokeAccessToken } from "./src/authenticate"
+import { AuthClient, AuthProvider, useAuthContext } from "./src/authenticate";
 
-export{ initialize, getAuthorizationURL, requestAccessTokenDetails, refreshAccessToken, getAccessToken, getDataLayer, getDecodedIDToken, getOIDCServiceEndpoints, getSignOutURL, SignOut, userInformation, revokeAccessToken };
+export { AuthClient, AuthProvider, useAuthContext };
