@@ -30,13 +30,14 @@ import { Linking } from "react-native";
 import { AsgardeoAuthException } from "@asgardeo/auth-js/src/exception";
 import React, { useContext, useEffect, useState } from "react";
 
-const initialState: TokenResponse = {
+const initialState = {
     accessToken: "",
     idToken: "",
     expiresIn: "",
     scope: "",
     refreshToken: "",
-    tokenType: ""
+    tokenType: "",
+    isAuthenticated: false
 }
 
 const AuthClient = auth;
@@ -67,14 +68,9 @@ const AuthProvider = (props) => {
      * @param config - Authentication config object.
      *
      * @example
-     * const config = {
-     *     serverOrigin:"https://10.0.2.2:9443",
-     *     signInRedirectURL:"http://10.0.2.2:8081",
-     *     clientID: "ClientID",
-     *     SignOutURL: "http://10.0.2.2:8081"
-     * };
-     *
+     * ```
      * initialize(config);
+     * ```
      */
     const initialize = async (config: AuthClientConfig): Promise<void> => {
 
@@ -97,7 +93,7 @@ const AuthProvider = (props) => {
     }
 
     /**
-     * This is an async method that returns a Promise that resolves with the authorization URL.
+     * This is an async method that returns a Promise which resolves with the authorization URL.
      *
      * @return {Promise<string>} - A promise that resolves with the authorization URL.
      *
@@ -120,7 +116,7 @@ const AuthProvider = (props) => {
      * 
      * @example
      * ```
-     * auth.signIn()
+     * signIn()
      * ```
      */
     const signIn = async () => {
@@ -165,7 +161,13 @@ const AuthProvider = (props) => {
         const sessionState = dataList[1].split("=")[1];
 
         const authState = await auth.requestAccessToken(code, sessionState);
-        setState({ ...authState });
+
+        /**
+         * TODO: Remove this waiting once https://github.com/asgardeo/asgardeo-auth-js-sdk/issues/164 is fixed.
+         */
+        await getAccessToken();
+
+        setState({ ...authState, isAuthenticated: true });
         return authState;
     }
 
@@ -186,8 +188,9 @@ const AuthProvider = (props) => {
      */
     const refreshAccessToken = async (): Promise<TokenResponse> => {
 
+        setState({ ...state, isAuthenticated: false });
         const authState = await auth.refreshAccessToken();
-        setState({ ...authState });
+        setState({ ...authState, isAuthenticated: true });
         return authState;
     }
 
@@ -211,18 +214,26 @@ const AuthProvider = (props) => {
     /**
      * This method clears all authentication data and returns the sign-out URL.
      *
-     * @param signOutUrl - The Signout url it get from getSignoutUrl method.
-     * @return {Promise<string>} - A Promise that resolves with the sign-out URL.
-     *
      * @example
      * ```
-     * _signOut = signOut(url);
+     * signOut();
      * ```
      */
     const signOut = async () => {
 
-        const signOutUrl = await auth.getSignOutURL();
-        Linking.openURL(signOutUrl);
+        await auth.getSignOutURL()
+            .then((signOutUrl) => {
+                Linking.openURL(signOutUrl);
+            })
+            .catch((error) => {
+                throw new AsgardeoAuthException(
+                    "AUTHENTICATE-SO-IV01",
+                    "authenticate",
+                    "signOut",
+                    "Failed to retrieve signout url",
+                    error
+                )
+            })
     }
 
     /**
@@ -315,6 +326,21 @@ const AuthProvider = (props) => {
     }
 
     /**
+     * This method returns the id token.
+     *
+     * @return {Promise<string>} - A Promise that resolves with the id token.
+     *
+     * @example
+     * ```
+     * const idToken = await getIDToken();
+     * ```
+     */
+    const getIDToken = async (): Promise<string> => {
+
+        return await auth.getIDToken();
+    }
+
+    /**
      * This method returns if the user is authenticated or not.
      *
      * @return {Promise<boolean>} - A Promise that resolves with `true` if the user is authenticated, `false` otherwise.
@@ -359,15 +385,20 @@ const AuthProvider = (props) => {
         return await auth.setPKCECode(pkce);
     }
 
+    /**
+     * This function will handle authentication/ signout redirections.
+     * 
+     * @param authUrl - redirection url.
+     */
     const handleAuthRedirect = async (authUrl): Promise<void> => {
 
         if (url.parse(authUrl.url).query.indexOf("code=") > -1) {
             await requestAccessTokenDetails(authUrl);
         } else if (url.parse(authUrl.url).query.indexOf("state=sign_out") > -1) {
             const dataList = url.parse(authUrl.url).query.split("&");
-            const state = dataList[0].split("=")[1];
+            const authState = dataList[0].split("=")[1];
     
-            if (state === "sign_out_success") {
+            if (authState === "sign_out_success") {
                 try {
                     await auth.getDataLayer().removeOIDCProviderMetaData();
                     await auth.getDataLayer().removeTemporaryData();
@@ -403,12 +434,15 @@ const AuthProvider = (props) => {
                 userInformation,
                 revokeAccessToken,
                 getAccessToken,
+                getIDToken,
                 isAuthenticated,
                 getPKCECode,
                 setPKCECode,
                 state
             } }
-        ></AuthContext.Provider>
+        >
+            {props.children}
+        </AuthContext.Provider>
     )
 };
 

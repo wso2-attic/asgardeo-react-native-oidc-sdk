@@ -21,30 +21,33 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { LoginContextProvider } from './context/LoginContext';
-import LoginScreen from './Screen/LoginScreen';
-import HomeScreen from './Screen/HomeScreen';
+import LoginScreen from './screen/LoginScreen';
+import HomeScreen from './screen/HomeScreen';
+import { AuthProvider } from "@asgardeo/auth-react-native";
 
 const Stack = createStackNavigator();
 
 const App = () => {
 
   return (
-    <LoginContextProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="LoginScreen">
-          <Stack.Screen
-            name="LoginScreen"
-            component={LoginScreen}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen
-            name="HomeScreen"
-            component={HomeScreen}
-            options={{headerShown: false}}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </LoginContextProvider>
+    <AuthProvider>
+      <LoginContextProvider>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="LoginScreen">
+            <Stack.Screen
+              name="LoginScreen"
+              component={LoginScreen}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="HomeScreen"
+              component={HomeScreen}
+              options={{headerShown: false}}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </LoginContextProvider>
+    </AuthProvider>
   );
 };
 

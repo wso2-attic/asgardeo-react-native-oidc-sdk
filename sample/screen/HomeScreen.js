@@ -16,34 +16,18 @@
  * under the License.
  */
 
-import {
-  SignOut,
-  getSignOutURL,
-  refreshAccessToken,
-  getDecodedIDToken,
-} from '@asgardeo/auth-react-native';
-import React, { useState, useEffect, useContext } from 'react';
-import { Linking, Text, View, ActivityIndicator } from 'react-native';
+import { useAuthContext } from '@asgardeo/auth-react-native';
+import React from 'react';
+import { Text, View, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import url from 'url';
 import { ButtonContainer, Button } from '../components';
 import { styles } from '../components/styles';
-import { LoginContext, initialState } from '../context/LoginContext';
+import { useLoginContext } from '../context/LoginContext';
 
 const HomeScreen = (props) => {
 
-  const loginContext = useContext(LoginContext);
-  [loading, setLoading] = useState(false);
-
-  /**
-   * This hook will registers the url listener.
-   */
-  useEffect(() => {
-    Linking.addEventListener('url', handleopenUrl);
-    return () => {
-      Linking.removeEventListener('url', handleopenUrl);
-    }
-  }, []);
+  const { loginState, setLoginState, loading, setLoading } = useLoginContext();
+  const { state, signOut, refreshAccessToken } = useAuthContext();
 
   /**
    * This function will handle the refresh button click.
@@ -51,18 +35,7 @@ const HomeScreen = (props) => {
   const handleRefreshtoken = async () => {
 
     setLoading(true);
-
     refreshAccessToken()
-      .then((reftoken) => {
-        getDecodedIDToken().then((decodeID) => {
-          loginContext.setLoginState({ ...loginContext.loginState, ...reftoken, ...decodeID });
-          setLoading(false);
-        })
-        .catch((error) => {
-          setLoading(false);
-          console.log(error);
-        });
-      })
       .catch((error) => {
         setLoading(false);
         console.log(error);
@@ -74,29 +47,15 @@ const HomeScreen = (props) => {
    */
   const handleSignOut = async () => {
 
-    const signOutUrl = await getSignOutURL();
-    Linking.openURL(signOutUrl);
-  };
+    setLoginState({
+      ...loginState, ...state, hasLogoutInitiated: true
+    });
 
-  /**
-   * This function will listen for browser redirections and proceed with the signout.
-   * 
-   * @param {*} Url - Redirect url object.
-   */
-  const handleopenUrl = async (Url) => {
-
-    if (url.parse(Url.url).query.indexOf("state=sign_out") > -1) {
-      setLoading(true);
-      const _signOut = SignOut(Url);
-
-      if (_signOut === true) {
-        loginContext.setLoginState(initialState)
+    signOut()
+      .catch((error) => {
         setLoading(false);
-        props.navigation.navigate('LoginScreen');
-      } else {
-        setLoading(false);
-      }
-    }
+        console.log(error);
+      });
   };
 
   return (
@@ -104,14 +63,14 @@ const HomeScreen = (props) => {
       <View style = { styles.flex }>
         <View>
           <Text style = { styles.flexheading }>
-            Hi { loginContext.loginState.username } !
+            Hi { loginState.username } !
           </Text>
           <Text style = { styles.flexbody }>
-            AllowedScopes : { loginContext.loginState.allowedScopes }
+            AllowedScopes : { loginState.allowedScopes }
           </Text>
           <Text style = { styles.flexbody }>SessionState : </Text>
           <Text style = { styles.flexdetails }>
-            { loginContext.loginState.sessionState }
+            { loginState.sessionState }
           </Text>
         </View>
       </View>
@@ -119,19 +78,19 @@ const HomeScreen = (props) => {
       <View style = { styles.flex }>
         <View>
           <Text style = { styles.flexheading }>Refresh token</Text>
-          <Text style = { styles.reftoke }>{ loginContext.loginState.refreshToken }</Text>
+          <Text style = { styles.reftoke }>{ loginState.refreshToken }</Text>
         </View>
       </View>
 
       <View style = { styles.flex }>
         <View>
           <Text style = { styles.flexheading }>Decoded ID token</Text>
-          <Text style = { styles.body }>amr : { loginContext.loginState.amr }, { '\n' }at_hash : 
-            { loginContext.loginState.at_hash }, { '\n' }aud: { loginContext.loginState.aud }, {'\n'}azp : 
-            { loginContext.loginState.azp }, {'\n'}c_hash : { loginContext.loginState.c_hash }, {'\n'}exp : 
-            { loginContext.loginState.exp }, {'\n'}iat : { loginContext.loginState.iat }, {'\n'}iss : 
-            { loginContext.loginState.iss }, {'\n'}nbf :  {loginContext.loginState.nbf }, {'\n'}sub : 
-            { loginContext.loginState.sub }</Text>
+          <Text style = { styles.body }>amr : { loginState.amr }, { '\n' }at_hash : 
+            { loginState.at_hash }, { '\n' }aud: { loginState.aud }, {'\n'}azp : 
+            { loginState.azp }, {'\n'}c_hash : { loginState.c_hash }, {'\n'}exp : 
+            { loginState.exp }, {'\n'}iat : { loginState.iat }, {'\n'}iss : 
+            { loginState.iss }, {'\n'}nbf :  { loginState.nbf }, {'\n'}sub : 
+            { loginState.sub }</Text>
         </View>
       </View>
 
@@ -139,7 +98,7 @@ const HomeScreen = (props) => {
         <View style = { styles.flex }>
           <View>
             <Text style = { styles.flexheading }>ID token</Text>
-            <Text style = { styles.body }>{ loginContext.loginState.idToken }</Text>
+            <Text style = { styles.body }>{ loginState.idToken }</Text>
           </View>
         </View>
       </ScrollView>

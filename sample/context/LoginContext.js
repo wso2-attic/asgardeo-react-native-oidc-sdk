@@ -16,13 +16,14 @@
  * under the License.
  */
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 const initialState = {
     accessToken: '',
     refreshToken: '',
     idToken: '',
     haslogin: false,
+    hasLogoutInitiated: false,
     allowedScopes: '',
     username: '',
     sessionState: '',
@@ -35,24 +36,32 @@ const initialState = {
     iat: '',
     iss: '',
     nbf: '',
-    sub: ''
+    sub: '',
+    loading: false
 };
 
 const LoginContext = React.createContext();
 
 const LoginContextProvider = (props) => {
     const [loginState, setLoginState] = useState(initialState);
+    [loading, setLoading] = useState(false);
 
     return (
         <LoginContext.Provider
-            value = {{
+            value = { {
                 loginState,
-                setLoginState
-            }}
+                setLoginState,
+                loading,
+                setLoading
+            } }
         >
             {props.children}
         </LoginContext.Provider>
     )
-}
+};
 
-export { initialState, LoginContext, LoginContextProvider };
+const useLoginContext = () => {
+    return useContext(LoginContext);
+};
+
+export { initialState, LoginContextProvider, useLoginContext };
