@@ -37,7 +37,6 @@
   "deprecated": false,
   "description": "Asgardeo Auth React Native SDK for Mobile Applications.",
   "devDependencies": {
-    "@asgardeo/auth-js": "^0.2.0",
     "@babel/core": "^7.8.4",
     "@babel/runtime": "^7.8.4",
     "@react-native-async-storage/async-storage": "^1.13.2",
