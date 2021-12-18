@@ -22,6 +22,7 @@ import {
   BasicUserInfo,
   DataLayer,
   DecodedIDTokenPayload,
+  GetAuthURLConfig,
   OIDCEndpoints,
   TokenResponse,
 } from "@asgardeo/auth-js";
@@ -29,8 +30,9 @@ import url from "url";
 import { Linking } from "react-native";
 import { AsgardeoAuthException } from "@asgardeo/auth-js/src/exception";
 import React, { useContext, useEffect, useState } from "react";
+import { AuthContextInterface, AuthStateInterface, AuthUrl } from "./models";
 
-const initialState = {
+const initialState: AuthStateInterface = {
     accessToken: "",
     idToken: "",
     expiresIn: "",
@@ -45,11 +47,11 @@ const AuthClient = auth;
 /**
  * Authentication Context to hold global states in react components.
  */
-const AuthContext = React.createContext(null);
+const AuthContext = React.createContext<AuthContextInterface>(null);
 
 const AuthProvider = (props) => {
     const [state, setState] = useState(initialState);
-    
+
     /**
      * This hook will register the url listener.
      */
@@ -65,7 +67,8 @@ const AuthProvider = (props) => {
      *
      * This method initializes the SDK with the config data.
      *
-     * @param config - Authentication config object.
+     * @param {AuthClientConfig} config - Authentication config object.
+     * @return {Promise<void>}
      *
      * @example
      * ```
@@ -95,6 +98,7 @@ const AuthProvider = (props) => {
     /**
      * This is an async method that returns a Promise which resolves with the authorization URL.
      *
+     * @param {GetAuthURLConfig} config - Auth url config.
      * @return {Promise<string>} - A promise that resolves with the authorization URL.
      *
      * @example
@@ -106,7 +110,7 @@ const AuthProvider = (props) => {
      * });
      * ```
      */ 
-    const getAuthorizationURL = async (config): Promise<string> => {
+    const getAuthorizationURL = async (config: GetAuthURLConfig): Promise<string> => {
 
         return await auth.getAuthorizationURL(config);
     }
@@ -114,12 +118,14 @@ const AuthProvider = (props) => {
     /**
      * This function obtains the authorization url and perform the signin redirection.
      * 
+     * @return {Promise<void>}
+     * 
      * @example
      * ```
      * signIn()
      * ```
      */
-    const signIn = async () => {
+    const signIn = async (): Promise<void> => {
         await auth.getAuthorizationURL()
             .then((url) => {
                 Linking.openURL(url);
@@ -139,7 +145,7 @@ const AuthProvider = (props) => {
      * This is an method that sends a request to obtain the access token and returns a Promise
      * that resolves with the token and other relevant data.
      *
-     * @param authUrl - The authorization url.
+     * @param {AuthUrl} authUrl - The authorization url.
      *
      * @return {Promise<TokenResponse>} - A Promise that resolves with the token response.
      *
@@ -153,7 +159,7 @@ const AuthProvider = (props) => {
      * });
      * ```
      */
-    const requestAccessTokenDetails = async (authUrl): Promise<TokenResponse> => {
+    const requestAccessTokenDetails = async (authUrl: AuthUrl): Promise<TokenResponse> => {
 
         const urlObject = url.parse(authUrl.url);
         const dataList = urlObject.query.split("&");
@@ -214,12 +220,14 @@ const AuthProvider = (props) => {
     /**
      * This method clears all authentication data and returns the sign-out URL.
      *
+     * @return  {Promise<void>}
+     * 
      * @example
      * ```
      * signOut();
      * ```
      */
-    const signOut = async () => {
+    const signOut = async (): Promise<void> => {
 
         await auth.getSignOutURL()
             .then((signOutUrl) => {
@@ -287,7 +295,7 @@ const AuthProvider = (props) => {
      *
      * **This method also clears the authentication data.**
      *
-     * @return {response} - A Promise that returns the response of the revoke-access-token request.
+     * @return {Promise<any>} - A Promise that returns the response of the revoke-access-token request.
      *
      * @example
      * ```
@@ -374,7 +382,8 @@ const AuthProvider = (props) => {
      * This method sets the PKCE code to the data store.
      *
      * @param {string} pkce - The PKCE code.
-     *
+     * @return  {Promise<void>}
+     * 
      * @example
      * ```
      * await setPKCECode("pkce_code")
@@ -388,9 +397,10 @@ const AuthProvider = (props) => {
     /**
      * This function will handle authentication/ signout redirections.
      * 
-     * @param authUrl - redirection url.
+     * @param {AuthUrl} authUrl - redirection url.
+     * @return  {Promise<void>}
      */
-    const handleAuthRedirect = async (authUrl): Promise<void> => {
+    const handleAuthRedirect = async (authUrl: AuthUrl): Promise<void> => {
 
         if (url.parse(authUrl.url).query.indexOf("code=") > -1) {
             await requestAccessTokenDetails(authUrl);
@@ -446,7 +456,7 @@ const AuthProvider = (props) => {
     )
 };
 
-const useAuthContext = () => {
+const useAuthContext = (): AuthContextInterface => {
     return useContext(AuthContext);
 };
 

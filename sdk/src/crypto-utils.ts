@@ -38,7 +38,7 @@ export class ReactNativeCryptoUtils implements CryptoUtils {
      * @param {CryptoJS.WordArray} value.
      * @returns {string} base 64 url encoded value.
      */
-    public base64URLEncode(value: CryptoJS.WordArray): string {
+    public base64URLEncode(value: WordArray): string {
 
         return Base64.stringify(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
     }
