@@ -1,45 +1,46 @@
 {
-  "_from": "file:../asgardeo-auth-react-native-0.0.1.tgz",
-  "_id": "@asgardeo/auth-react-native@0.0.1",
-  "_inBundle": false,
-  "_integrity": "sha512-EpwFhIdpWIHkNfSJzR1dF5aafAD/dok+jh5hZZ1FKs7vXI0BxgieJu/URikOpFE1RZa5a6eomzKnYnXfEvni9w==",
-  "_location": "/@asgardeo/auth-react-native",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "file",
-    "where": "/home/abirame/Documents/GitHub/asgardio-react-native-oidc-sdk/sdk/sample",
-    "raw": "../asgardeo-auth-react-native-0.0.1.tgz",
-    "rawSpec": "../asgardeo-auth-react-native-0.0.1.tgz",
-    "saveSpec": "file:../asgardeo-auth-react-native-0.0.1.tgz",
-    "fetchSpec": "/home/abirame/Documents/GitHub/asgardio-react-native-oidc-sdk/sdk/asgardeo-auth-react-native-0.0.1.tgz"
+  "name": "@asgardeo/auth-react-native",
+  "description": "Asgardeo Auth React Native SDK for Mobile Applications.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "_requiredBy": [
-    "#USER",
-    "/"
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asgardeo/asgardeo-react-native-oidc-sdk.git"
+  },
+  "keywords": [
+    "Asgardeo",
+    "OIDC",
+    "OAuth2",
+    "Authentication",
+    "Authorization",
+    "React Native"
   ],
-  "_resolved": "/home/abirame/Documents/GitHub/asgardio-react-native-oidc-sdk/sdk/asgardeo-auth-react-native-0.0.1.tgz",
-  "_shasum": "3c8540389786223598f3cf4cdd4d79dadde3b03e",
-  "_spec": "../asgardeo-auth-react-native-0.0.1.tgz",
-  "_where": "/home/abirame/Documents/GitHub/asgardio-react-native-oidc-sdk/sdk/sample",
-  "author": "",
-  "bundleDependencies": false,
+  "author": "Asgardeo",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/asgardeo/asgardeo-react-native-oidc-sdk/issues"
+  },
+  "homepage": "https://github.com/asgardeo/asgardeo-react-native-oidc-sdk#readme",
   "dependencies": {
+    "@asgardeo/auth-js": "^1.0.0",
+    "@react-native-async-storage/async-storage": "^1.13.2",
     "@types/crypto-js": "^4.0.1",
-    "axios": "^0.21.1",
     "base-64": "^1.0.0",
     "crypto-js": "^3.3.0",
     "jsrsasign": "^10.5.1",
     "jsrsasign-util": "^1.0.5",
     "react": "16.13.1",
     "react-native": "^0.63.4",
-    "react-native-gesture-handler": "^1.9.0"
+    "react-native-gesture-handler": "^1.9.0",
+    "url": "^0.11.0"
   },
   "deprecated": false,
-  "description": "Asgardeo Auth React Native SDK for Mobile Applications.",
   "devDependencies": {
     "@babel/core": "^7.8.4",
     "@babel/runtime": "^7.8.4",
-    "@react-native-async-storage/async-storage": "^1.13.2",
     "@react-native-community/eslint-config": "^1.1.0",
     "@types/jest": "^26.0.16",
     "@types/react": "^17.0.0",
@@ -50,14 +51,6 @@
     "metro-react-native-babel-preset": "^0.65.1",
     "react-test-renderer": "16.13.1",
     "text-encoding-polyfill": "^0.6.7",
-    "typescript": "^4.1.2",
-    "url": "^0.11.0"
-  },
-  "license": "Apache-2.0",
-  "main": "index.js",
-  "name": "@asgardeo/auth-react-native",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "version": "0.0.1"
+    "typescript": "^4.1.2"
+  }
 }
