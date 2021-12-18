@@ -401,31 +401,34 @@ const AuthProvider = (props) => {
      * @return  {Promise<void>}
      */
     const handleAuthRedirect = async (authUrl: AuthUrl): Promise<void> => {
-
-        if (url.parse(authUrl.url).query.indexOf("code=") > -1) {
-            await requestAccessTokenDetails(authUrl);
-        } else if (url.parse(authUrl.url).query.indexOf("state=sign_out") > -1) {
-            const dataList = url.parse(authUrl.url).query.split("&");
-            const authState = dataList[0].split("=")[1];
-    
-            if (authState === "sign_out_success") {
-                try {
-                    await auth.getDataLayer().removeOIDCProviderMetaData();
-                    await auth.getDataLayer().removeTemporaryData();
-                    await auth.getDataLayer().removeSessionData();
-                    setState(initialState);
-                } catch(error) {
-                    throw new AsgardeoAuthException(
-                        "AUTHENTICATE-HAR-IV01",
-                        "authenticate",
-                        "handleAuthRedirect",
-                        "Error in signout",
-                        error
-                    )
+        try {
+            if (url.parse(authUrl?.url)?.query.indexOf("code=") > -1) {
+                await requestAccessTokenDetails(authUrl);
+            } else if (url.parse(authUrl?.url)?.query.indexOf("state=sign_out") > -1) {
+                const dataList = url.parse(authUrl?.url)?.query.split("&");
+                const authState = dataList[0].split("=")[1];
+        
+                if (authState === "sign_out_success") {
+                    try {
+                        await auth.getDataLayer().removeOIDCProviderMetaData();
+                        await auth.getDataLayer().removeTemporaryData();
+                        await auth.getDataLayer().removeSessionData();
+                        setState(initialState);
+                    } catch(error) {
+                        throw new AsgardeoAuthException(
+                            "AUTHENTICATE-HAR-IV01",
+                            "authenticate",
+                            "handleAuthRedirect",
+                            "Error in signout",
+                            error
+                        )
+                    }
                 }
+            } else {
+                console.log("Invalid redirection url");
             }
-        } else {
-            console.log("Invalid redirection url");
+        } catch (error) {
+            console.log("Error when handling url redirection.", error);
         }
     }
 
