@@ -10,10 +10,6 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "@asgardeo/auth-js": "^0.2.0",
-    "@asgardeo/auth-react-native": "file:../asgardeo-auth-react-native-0.0.1.tgz",
-    "@react-native-async-storage/async-storage": "^1.13.2",
-    "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.9.0",
     "@react-navigation/stack": "^5.13.0",
     "react": "16.13.1",
@@ -24,8 +20,7 @@
     "react-native-screens": "^2.16.1",
     "react-native-webview": "^11.0.3",
     "reactotron-react-native": "^5.0.0",
-    "text-encoding-polyfill": "^0.6.7",
-    "url": "^0.11.0"
+    "text-encoding-polyfill": "^0.6.7"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
