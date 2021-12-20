@@ -16,31 +16,31 @@
  * under the License.
  */
 
-import { auth } from "./wrapper";
-import {
-  AuthClientConfig,
-  BasicUserInfo,
-  DataLayer,
-  DecodedIDTokenPayload,
-  GetAuthURLConfig,
-  OIDCEndpoints,
-  TokenResponse,
-} from "@asgardeo/auth-js";
 import url from "url";
-import { Linking } from "react-native";
+import {
+    AuthClientConfig,
+    BasicUserInfo,
+    DataLayer,
+    DecodedIDTokenPayload,
+    GetAuthURLConfig,
+    OIDCEndpoints,
+    TokenResponse
+} from "@asgardeo/auth-js";
 import { AsgardeoAuthException } from "@asgardeo/auth-js/src/exception";
-import React, { useContext, useEffect, useState } from "react";
+import React, { FunctionComponent, useContext, useEffect, useState } from "react";
+import { Linking } from "react-native";
 import { AuthContextInterface, AuthStateInterface, AuthUrl } from "./models";
+import { auth } from "./wrapper";
 
 const initialState: AuthStateInterface = {
     accessToken: "",
-    idToken: "",
     expiresIn: "",
-    scope: "",
+    idToken: "",
+    isAuthenticated: false,
     refreshToken: "",
-    tokenType: "",
-    isAuthenticated: false
-}
+    scope: "",
+    tokenType: ""
+};
 
 const AuthClient = auth;
 
@@ -49,18 +49,20 @@ const AuthClient = auth;
  */
 const AuthContext = React.createContext<AuthContextInterface>(null);
 
-const AuthProvider = (props) => {
-    const [state, setState] = useState(initialState);
+const AuthProvider: FunctionComponent = (
+    props: { children: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal }
+) => {
+    const [ state, setState ] = useState(initialState);
 
     /**
      * This hook will register the url listener.
      */
     useEffect(() => {
-        Linking.addEventListener('url', handleAuthRedirect);
+        Linking.addEventListener("url", handleAuthRedirect);
 
         return () => {
-            Linking.removeEventListener('url', handleAuthRedirect);
-        }
+            Linking.removeEventListener("url", handleAuthRedirect);
+        };
     }, []);
 
     /**
@@ -78,7 +80,7 @@ const AuthProvider = (props) => {
     const initialize = async (config: AuthClientConfig): Promise<void> => {
 
         await auth.initialize(config);
-    }
+    };
 
     /**
      * This method returns the `DataLayer` object that allows you to access authentication data.
@@ -93,7 +95,7 @@ const AuthProvider = (props) => {
     const getDataLayer = async (): Promise<DataLayer<any>> => {
 
         return await auth.getDataLayer();
-    }
+    };
 
     /**
      * This is an async method that returns a Promise which resolves with the authorization URL.
@@ -113,7 +115,7 @@ const AuthProvider = (props) => {
     const getAuthorizationURL = async (config: GetAuthURLConfig): Promise<string> => {
 
         return await auth.getAuthorizationURL(config);
-    }
+    };
 
     /**
      * This function obtains the authorization url and perform the signin redirection.
@@ -137,9 +139,9 @@ const AuthProvider = (props) => {
                     "signIn",
                     "Failed to retrieve authorization url",
                     error
-                )
-            })
-    }
+                );
+            });
+    };
 
     /**
      * This is an method that sends a request to obtain the access token and returns a Promise
@@ -174,8 +176,9 @@ const AuthProvider = (props) => {
         await getAccessToken();
 
         setState({ ...authState, isAuthenticated: true });
+
         return authState;
-    }
+    };
 
     /**
      * This method refreshes the access token and returns a Promise that resolves with the new access
@@ -196,9 +199,11 @@ const AuthProvider = (props) => {
 
         setState({ ...state, isAuthenticated: false });
         const authState = await auth.refreshAccessToken();
+
         setState({ ...authState, isAuthenticated: true });
+
         return authState;
-    }
+    };
 
     /**
      * This method returns the sign-out URL.
@@ -215,7 +220,7 @@ const AuthProvider = (props) => {
     const getSignOutURL = async (): Promise<string> => {
 
         return await auth.getSignOutURL();
-    }
+    };
 
     /**
      * This method clears all authentication data and returns the sign-out URL.
@@ -240,9 +245,9 @@ const AuthProvider = (props) => {
                     "signOut",
                     "Failed to retrieve signout url",
                     error
-                )
-            })
-    }
+                );
+            });
+    };
 
     /**
      * This method returns OIDC service endpoints that are fetched from the `.well-known` endpoint.
@@ -257,7 +262,7 @@ const AuthProvider = (props) => {
     const getOIDCServiceEndpoints = async (): Promise<OIDCEndpoints> => {
 
         return await auth.getOIDCServiceEndpoints();
-    }
+    };
 
     /**
      * This method decodes the payload of the ID token and returns it.
@@ -273,7 +278,7 @@ const AuthProvider = (props) => {
     const getDecodedIDToken = async (): Promise<DecodedIDTokenPayload> => {
 
         return await auth.getDecodedIDToken();
-    }
+    };
 
     /**
      * This method returns the basic user information obtained from the ID token.
@@ -288,7 +293,7 @@ const AuthProvider = (props) => {
     const userInformation = async (): Promise<BasicUserInfo> => {
 
         return await auth.getBasicUserInfo();
-    }
+    };
 
     /**
      * This method revokes the access token.
@@ -311,12 +316,13 @@ const AuthProvider = (props) => {
         await auth.revokeAccessToken()
             .then((response) => {
                 setState(initialState);
+
                 return Promise.resolve(response);
             })
             .catch((error) => {
                 return Promise.reject(error);
-            })
-    }
+            });
+    };
 
     /**
      * This method returns the access token.
@@ -331,7 +337,7 @@ const AuthProvider = (props) => {
     const getAccessToken = async (): Promise<string> => {
 
         return await auth.getAccessToken();
-    }
+    };
 
     /**
      * This method returns the id token.
@@ -346,7 +352,7 @@ const AuthProvider = (props) => {
     const getIDToken = async (): Promise<string> => {
 
         return await auth.getIDToken();
-    }
+    };
 
     /**
      * This method returns if the user is authenticated or not.
@@ -361,7 +367,7 @@ const AuthProvider = (props) => {
     const isAuthenticated = async (): Promise<boolean> => {
 
         return await auth.isAuthenticated();
-    }
+    };
 
     /**
      * This method returns the PKCE code generated during the generation of the authentication URL.
@@ -376,7 +382,7 @@ const AuthProvider = (props) => {
     const getPKCECode = async (): Promise<string> => {
 
         return await auth.getPKCECode();
-    }
+    };
 
     /**
      * This method sets the PKCE code to the data store.
@@ -392,7 +398,7 @@ const AuthProvider = (props) => {
     const setPKCECode = async (pkce: string): Promise<void> => {
 
         return await auth.setPKCECode(pkce);
-    }
+    };
 
     /**
      * This function will handle authentication/ signout redirections.
@@ -421,42 +427,44 @@ const AuthProvider = (props) => {
                             "handleAuthRedirect",
                             "Error in signout",
                             error
-                        )
+                        );
                     }
                 }
             } else {
+                // eslint-disable-next-line no-console
                 console.log("Invalid redirection url");
             }
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.log("Error when handling url redirection.", error);
         }
-    }
+    };
 
     return (
         <AuthContext.Provider
             value={ {
-                initialize,
-                getDataLayer,
-                getAuthorizationURL,
-                signIn,
-                refreshAccessToken,
-                getSignOutURL,
-                signOut,
-                getOIDCServiceEndpoints,
-                getDecodedIDToken,
-                userInformation,
-                revokeAccessToken,
                 getAccessToken,
+                getAuthorizationURL,
+                getDataLayer,
+                getDecodedIDToken,
                 getIDToken,
-                isAuthenticated,
+                getOIDCServiceEndpoints,
                 getPKCECode,
+                getSignOutURL,
+                initialize,
+                isAuthenticated,
+                refreshAccessToken,
+                revokeAccessToken,
                 setPKCECode,
-                state
+                signIn,
+                signOut,
+                state,
+                userInformation
             } }
         >
-            {props.children}
+            { props.children }
         </AuthContext.Provider>
-    )
+    );
 };
 
 const useAuthContext = (): AuthContextInterface => {

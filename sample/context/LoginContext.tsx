@@ -16,51 +16,54 @@
  * under the License.
  */
 
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from "react";
 
 const initialState = {
-    accessToken: '',
-    refreshToken: '',
-    idToken: '',
-    haslogin: false,
+    accessToken: "",
+    allowedScopes: "",
+    amr: "",
+    at_hash: "",
+    aud: "",
+    azp: "",
+    c_hash: "",
+    exp: "",
+    hasLogin: false,
     hasLogoutInitiated: false,
-    allowedScopes: '',
-    username: '',
-    sessionState: '',
-    amr: '',
-    at_hash: '',
-    aud: '',
-    azp: '',
-    c_hash: '',
-    exp: '',
-    iat: '',
-    iss: '',
-    nbf: '',
-    sub: '',
-    loading: false
+    iat: "",
+    idToken: "",
+    iss: "",
+    loading: false,
+    nbf: "",
+    refreshToken: "",
+    sessionState: "",
+    sub: "",
+    username: ""
 };
 
-const LoginContext = React.createContext();
+const LoginContext = React.createContext(null);
 
-const LoginContextProvider = (props) => {
-    const [loginState, setLoginState] = useState(initialState);
-    [loading, setLoading] = useState(false);
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+const LoginContextProvider = (
+    props: { children: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal; }
+) => {
+    const [ loginState, setLoginState ] = useState(initialState);
+    const [ loading, setLoading ] = useState(false);
 
     return (
         <LoginContext.Provider
             value = { {
-                loginState,
-                setLoginState,
                 loading,
-                setLoading
+                loginState,
+                setLoading,
+                setLoginState
             } }
         >
-            {props.children}
+            { props.children }
         </LoginContext.Provider>
-    )
+    );
 };
 
-const useLoginContext = () => {
+const useLoginContext = (): any => {
     return useContext(LoginContext);
 };
 

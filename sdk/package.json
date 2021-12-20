@@ -3,7 +3,8 @@
   "description": "Asgardeo Auth React Native SDK for Mobile Applications.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "version": "0.0.1",
   "repository": {
@@ -41,13 +42,17 @@
   "devDependencies": {
     "@babel/core": "^7.8.4",
     "@babel/runtime": "^7.8.4",
-    "@react-native-community/eslint-config": "^1.1.0",
     "@types/jest": "^26.0.16",
     "@types/react": "^17.0.0",
     "@types/react-native": "^0.63.37",
     "@types/react-test-renderer": "^17.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
     "babel-jest": "^25.1.0",
-    "eslint": "^6.5.1",
+    "eslint": "^7.32.0",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-react": "^7.27.1",
+    "eslint-plugin-react-hooks": "^4.3.0",
     "metro-react-native-babel-preset": "^0.65.1",
     "react-test-renderer": "16.13.1",
     "text-encoding-polyfill": "^0.6.7",

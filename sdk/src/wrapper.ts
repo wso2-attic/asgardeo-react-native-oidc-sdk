@@ -17,8 +17,8 @@
  */
 
 import "text-encoding-polyfill";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AsgardeoAuthClient, Store } from "@asgardeo/auth-js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ReactNativeCryptoUtils } from "./crypto-utils";
 
 /**
@@ -36,6 +36,7 @@ class LocalStorage implements Store {
     async getData(key: string) {
 
         const _value = await AsyncStorage.getItem(key);
+
         return _value;
     }
 
@@ -53,6 +54,7 @@ class LocalStorage implements Store {
             await AsyncStorage.setItem(key, value);
         }
         catch(error) {
+            // eslint-disable-next-line no-console
             console.log("Error when setting item to the storage", error);
         }
     }
@@ -69,6 +71,7 @@ class LocalStorage implements Store {
             await AsyncStorage.removeItem(key);
         }
         catch(error) {
+            // eslint-disable-next-line no-console
             console.log("Error when removing item from the storage", error);
         }
     }

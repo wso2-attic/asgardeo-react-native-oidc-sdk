@@ -16,18 +16,18 @@
  * under the License.
  */
 
-import Base64 from "crypto-js/enc-base64";
-import utf8 from "crypto-js/enc-utf8";
-import WordArray from "crypto-js/lib-typedarrays";
-import sha256 from "crypto-js/sha256";
-import { AsgardeoAuthException } from "@asgardeo/auth-js/src/exception";
 import {
     CryptoUtils,
     DecodedIDTokenPayload,
     JWKInterface,
-    SUPPORTED_SIGNATURE_ALGORITHMS,
+    SUPPORTED_SIGNATURE_ALGORITHMS
 } from "@asgardeo/auth-js";
+import { AsgardeoAuthException } from "@asgardeo/auth-js/src/exception";
 import { decode as atob } from "base-64";
+import Base64 from "crypto-js/enc-base64";
+import utf8 from "crypto-js/enc-utf8";
+import WordArray from "crypto-js/lib-typedarrays";
+import sha256 from "crypto-js/sha256";
 import { KEYUTIL, KJUR } from "jsrsasign";
 
 export class ReactNativeCryptoUtils implements CryptoUtils {
@@ -126,6 +126,7 @@ export class ReactNativeCryptoUtils implements CryptoUtils {
      */
     public isValidIdToken(
         idToken: string,
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         jwk: any,
         clientID: string,
         issuer: string,
@@ -135,9 +136,9 @@ export class ReactNativeCryptoUtils implements CryptoUtils {
         const verification = KJUR.jws.JWS.verifyJWT(idToken, jwk, {
             alg: SUPPORTED_SIGNATURE_ALGORITHMS,
             aud: clientID,
-            iss: [issuer],
-            sub: username,
-            gracePeriod: clockTolerance
+            gracePeriod: clockTolerance,
+            iss: [ issuer ],
+            sub: username
         });
 
         return Promise.resolve(verification);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,30 +16,31 @@
  * under the License.
  */
 
-import React from 'react';
-import { Platform, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
+// eslint-disable-next-line react/prop-types
 const Button = ({ text, color, onPress }) => (
-  <TouchableOpacity
-    activeOpacity={0.8}
-    onPress={onPress}
-    style={[styles.buttonBox, { backgroundColor: color }]}
-  >
-    <Text style={styles.text}>{text}</Text>
-  </TouchableOpacity>
+    <TouchableOpacity
+        activeOpacity={ 0.8 }
+        onPress={ onPress }
+        style={ [ styles.buttonBox, { backgroundColor: color } ] }
+    >
+        <Text style={ styles.text }>{ text }</Text>
+    </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
-  text: {
-    color: 'white',
-  },
-  buttonBox: {
-    height: 50,
-    flex: 1,
-    margin: 5,
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
+    buttonBox: {
+        alignItems: "center",
+        flex: 1,
+        height: 50,
+        justifyContent: "center",
+        margin: 5
+    },
+    text: {
+        color: "white"
+    }
 });
 
 export default Button;

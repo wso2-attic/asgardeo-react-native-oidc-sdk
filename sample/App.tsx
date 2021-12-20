@@ -16,39 +16,40 @@
  * under the License.
  */
 
-import 'react-native-gesture-handler';
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { LoginContextProvider } from './context/LoginContext';
-import LoginScreen from './screen/LoginScreen';
-import HomeScreen from './screen/HomeScreen';
+import "react-native-gesture-handler";
 import { AuthProvider } from "@asgardeo/auth-react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import React from "react";
+import { LoginContextProvider } from "./context/LoginContext";
+import HomeScreen from "./screen/HomeScreen";
+import LoginScreen from "./screen/LoginScreen";
 
 const Stack = createStackNavigator();
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const App = () => {
 
-  return (
-    <AuthProvider>
-      <LoginContextProvider>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="LoginScreen">
-            <Stack.Screen
-              name="LoginScreen"
-              component={LoginScreen}
-              options={{headerShown: false}}
-            />
-            <Stack.Screen
-              name="HomeScreen"
-              component={HomeScreen}
-              options={{headerShown: false}}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </LoginContextProvider>
-    </AuthProvider>
-  );
+    return (
+        <AuthProvider>
+            <LoginContextProvider>
+                <NavigationContainer>
+                    <Stack.Navigator initialRouteName="LoginScreen">
+                        <Stack.Screen
+                            name="LoginScreen"
+                            component={ LoginScreen }
+                            options={ { headerShown: false } }
+                        />
+                        <Stack.Screen
+                            name="HomeScreen"
+                            component={ HomeScreen }
+                            options={ { headerShown: false } }
+                        />
+                    </Stack.Navigator>
+                </NavigationContainer>
+            </LoginContextProvider>
+        </AuthProvider>
+    );
 };
 
 export default App;

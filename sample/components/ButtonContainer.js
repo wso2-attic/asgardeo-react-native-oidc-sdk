@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,21 +16,21 @@
  * under the License.
  */
 
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React from "react";
+import { StyleSheet, View } from "react-native";
 
-const ButtonContainer = props => <View style={styles.view} {...props} />;
+const ButtonContainer = props => <View style={ styles.view } { ...props } />;
 
 const styles = StyleSheet.create({
-  view: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignSelf: 'flex-end',
-    flexDirection: 'row',
-    margin: 5
-  }
+    view: {
+        alignSelf: "flex-end",
+        bottom: 0,
+        flexDirection: "row",
+        left: 0,
+        margin: 5,
+        position: "absolute",
+        right: 0
+    }
 });
 
 export default ButtonContainer;
