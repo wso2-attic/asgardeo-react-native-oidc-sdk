@@ -18,6 +18,7 @@
 
 import url from "url";
 import {
+    AsgardeoAuthClient,
     AuthClientConfig,
     BasicUserInfo,
     DataLayer,
@@ -29,8 +30,9 @@ import {
 import { AsgardeoAuthException } from "@asgardeo/auth-js/src/exception";
 import React, { FunctionComponent, useContext, useEffect, useState } from "react";
 import { Linking } from "react-native";
+import { ReactNativeCryptoUtils } from "./crypto-utils";
 import { AuthContextInterface, AuthStateInterface, AuthUrl } from "./models";
-import { auth } from "./wrapper";
+import { LocalStorage } from "./store";
 
 const initialState: AuthStateInterface = {
     accessToken: "",
@@ -42,11 +44,12 @@ const initialState: AuthStateInterface = {
     tokenType: ""
 };
 
-const AuthClient = auth;
+// Instantiate the auth client object.
+const store = new LocalStorage();
+const cryptoUtils = new ReactNativeCryptoUtils();
+const AuthClient = new AsgardeoAuthClient(store, cryptoUtils);
 
-/**
- * Authentication Context to hold global states in react components.
- */
+// Authentication Context to hold global states in react components.
 const AuthContext = React.createContext<AuthContextInterface>(null);
 
 const AuthProvider: FunctionComponent = (
@@ -79,7 +82,7 @@ const AuthProvider: FunctionComponent = (
      */
     const initialize = async (config: AuthClientConfig): Promise<void> => {
 
-        await auth.initialize(config);
+        await AuthClient.initialize(config);
     };
 
     /**
@@ -94,7 +97,7 @@ const AuthProvider: FunctionComponent = (
      */
     const getDataLayer = async (): Promise<DataLayer<any>> => {
 
-        return await auth.getDataLayer();
+        return await AuthClient.getDataLayer();
     };
 
     /**
@@ -114,7 +117,7 @@ const AuthProvider: FunctionComponent = (
      */ 
     const getAuthorizationURL = async (config: GetAuthURLConfig): Promise<string> => {
 
-        return await auth.getAuthorizationURL(config);
+        return await AuthClient.getAuthorizationURL(config);
     };
 
     /**
@@ -128,7 +131,7 @@ const AuthProvider: FunctionComponent = (
      * ```
      */
     const signIn = async (): Promise<void> => {
-        await auth.getAuthorizationURL()
+        await AuthClient.getAuthorizationURL()
             .then((url) => {
                 Linking.openURL(url);
             })
@@ -168,7 +171,7 @@ const AuthProvider: FunctionComponent = (
         const code = dataList[0].split("=")[1];
         const sessionState = dataList[1].split("=")[1];
 
-        const authState = await auth.requestAccessToken(code, sessionState);
+        const authState = await AuthClient.requestAccessToken(code, sessionState);
 
         /**
          * TODO: Remove this waiting once https://github.com/asgardeo/asgardeo-auth-js-sdk/issues/164 is fixed.
@@ -198,7 +201,7 @@ const AuthProvider: FunctionComponent = (
     const refreshAccessToken = async (): Promise<TokenResponse> => {
 
         setState({ ...state, isAuthenticated: false });
-        const authState = await auth.refreshAccessToken();
+        const authState = await AuthClient.refreshAccessToken();
 
         setState({ ...authState, isAuthenticated: true });
 
@@ -219,7 +222,7 @@ const AuthProvider: FunctionComponent = (
      */
     const getSignOutURL = async (): Promise<string> => {
 
-        return await auth.getSignOutURL();
+        return await AuthClient.getSignOutURL();
     };
 
     /**
@@ -234,7 +237,7 @@ const AuthProvider: FunctionComponent = (
      */
     const signOut = async (): Promise<void> => {
 
-        await auth.getSignOutURL()
+        await AuthClient.getSignOutURL()
             .then((signOutUrl) => {
                 Linking.openURL(signOutUrl);
             })
@@ -261,7 +264,7 @@ const AuthProvider: FunctionComponent = (
      */
     const getOIDCServiceEndpoints = async (): Promise<OIDCEndpoints> => {
 
-        return await auth.getOIDCServiceEndpoints();
+        return await AuthClient.getOIDCServiceEndpoints();
     };
 
     /**
@@ -277,7 +280,7 @@ const AuthProvider: FunctionComponent = (
      */
     const getDecodedIDToken = async (): Promise<DecodedIDTokenPayload> => {
 
-        return await auth.getDecodedIDToken();
+        return await AuthClient.getDecodedIDToken();
     };
 
     /**
@@ -292,7 +295,7 @@ const AuthProvider: FunctionComponent = (
      */
     const userInformation = async (): Promise<BasicUserInfo> => {
 
-        return await auth.getBasicUserInfo();
+        return await AuthClient.getBasicUserInfo();
     };
 
     /**
@@ -313,7 +316,7 @@ const AuthProvider: FunctionComponent = (
      */
     const revokeAccessToken = async (): Promise<any> => {
 
-        await auth.revokeAccessToken()
+        await AuthClient.revokeAccessToken()
             .then((response) => {
                 setState(initialState);
 
@@ -336,7 +339,7 @@ const AuthProvider: FunctionComponent = (
      */
     const getAccessToken = async (): Promise<string> => {
 
-        return await auth.getAccessToken();
+        return await AuthClient.getAccessToken();
     };
 
     /**
@@ -351,7 +354,7 @@ const AuthProvider: FunctionComponent = (
      */
     const getIDToken = async (): Promise<string> => {
 
-        return await auth.getIDToken();
+        return await AuthClient.getIDToken();
     };
 
     /**
@@ -366,7 +369,7 @@ const AuthProvider: FunctionComponent = (
      */
     const isAuthenticated = async (): Promise<boolean> => {
 
-        return await auth.isAuthenticated();
+        return await AuthClient.isAuthenticated();
     };
 
     /**
@@ -381,7 +384,7 @@ const AuthProvider: FunctionComponent = (
      */
     const getPKCECode = async (): Promise<string> => {
 
-        return await auth.getPKCECode();
+        return await AuthClient.getPKCECode();
     };
 
     /**
@@ -397,7 +400,7 @@ const AuthProvider: FunctionComponent = (
      */
     const setPKCECode = async (pkce: string): Promise<void> => {
 
-        return await auth.setPKCECode(pkce);
+        return await AuthClient.setPKCECode(pkce);
     };
 
     /**
@@ -416,9 +419,9 @@ const AuthProvider: FunctionComponent = (
         
                 if (authState === "sign_out_success") {
                     try {
-                        await auth.getDataLayer().removeOIDCProviderMetaData();
-                        await auth.getDataLayer().removeTemporaryData();
-                        await auth.getDataLayer().removeSessionData();
+                        await AuthClient.getDataLayer().removeOIDCProviderMetaData();
+                        await AuthClient.getDataLayer().removeTemporaryData();
+                        await AuthClient.getDataLayer().removeSessionData();
                         setState(initialState);
                     } catch(error) {
                         throw new AsgardeoAuthException(
@@ -431,12 +434,12 @@ const AuthProvider: FunctionComponent = (
                     }
                 }
             } else {
-                // eslint-disable-next-line no-console
-                console.log("Invalid redirection url");
+                // TODO: Add logs when a logger is available.
+                // Tracked here https://github.com/asgardeo/asgardeo-auth-js-sdk/issues/151.
             }
         } catch (error) {
-            // eslint-disable-next-line no-console
-            console.log("Error when handling url redirection.", error);
+            // TODO: Add logs when a logger is available.
+            // Tracked here https://github.com/asgardeo/asgardeo-auth-js-sdk/issues/151.
         }
     };
 

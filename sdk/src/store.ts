@@ -17,15 +17,14 @@
  */
 
 import "text-encoding-polyfill";
-import { AsgardeoAuthClient, Store } from "@asgardeo/auth-js";
+import { Store } from "@asgardeo/auth-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ReactNativeCryptoUtils } from "./crypto-utils";
 
 /**
  * Create a Store class to store the authentication data. 
  * The following implementation uses the async-storage.
  */
-class LocalStorage implements Store {
+export class LocalStorage implements Store {
 
     /**
      * Get the data from the store.
@@ -33,7 +32,7 @@ class LocalStorage implements Store {
      * @param {string} key - key.
      *
      */
-    async getData(key: string) {
+    async getData(key: string): Promise<string> {
 
         const _value = await AsyncStorage.getItem(key);
 
@@ -54,8 +53,8 @@ class LocalStorage implements Store {
             await AsyncStorage.setItem(key, value);
         }
         catch(error) {
-            // eslint-disable-next-line no-console
-            console.log("Error when setting item to the storage", error);
+            // TODO: Add logs when a logger is available.
+            // Tracked here https://github.com/asgardeo/asgardeo-auth-js-sdk/issues/151.
         }
     }
 
@@ -71,14 +70,8 @@ class LocalStorage implements Store {
             await AsyncStorage.removeItem(key);
         }
         catch(error) {
-            // eslint-disable-next-line no-console
-            console.log("Error when removing item from the storage", error);
+            // TODO: Add logs when a logger is available.
+            // Tracked here https://github.com/asgardeo/asgardeo-auth-js-sdk/issues/151.
         }
     }
 }
-
-// Instantiate wrapper objects.
-const store = new LocalStorage();
-const cryptoUtils = new ReactNativeCryptoUtils();
-
-export const auth = new AsgardeoAuthClient(store, cryptoUtils);
