@@ -1,7 +1,7 @@
 {
   "name": "@asgardeo/auth-react-native",
   "description": "Asgardeo Auth React Native SDK for Mobile Applications.",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"

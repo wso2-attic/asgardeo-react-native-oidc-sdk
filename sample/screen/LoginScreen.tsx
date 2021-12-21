@@ -26,7 +26,7 @@ import { initialState, useLoginContext } from "../context/LoginContext";
 // Create a config object containing the necessary configurations.
 const config = {
     clientID: "<client_id>",
-    serverOrigin: "https://api.asgardeo.io/t/<your_org>",
+    serverOrigin: "https://10.0.2.2:9443",
     signInRedirectURL: "wso2sample://oauth2"
 };
 
