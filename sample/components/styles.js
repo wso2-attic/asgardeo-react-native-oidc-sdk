@@ -16,109 +16,121 @@
  * under the License.
  */
 
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  mainBody: {
-    backgroundColor: '#0000',
-  },
+    body: {
+        margin: 10
+    },
 
-  imageAlign: {
-    alignItems: 'center',
-  },
+    button: {
+        marginLeft: "35%",
+        width: "30%"
+    },
 
-  image: {
-    width: '85%',
-    height: '60%',
-    resizeMode: 'contain',
-    borderRadius: 30,
-  },
+    deco: {
+        fontWeight: "bold",
+        margin: 10,
+        textAlign: "center"
+    },
 
-  button: {
-    width: '30%',
-    marginLeft: '35%',
-  },
+    flex: {
+        backgroundColor: "#e2e2e2",
+        borderColor: "#c5c5c5",
+        borderWidth: 1
+    },
 
-  text: {
-    backgroundColor: '#f47421',
-    color: 'white',
-    textAlign: 'center',
-    justifyContent: 'center',
-    fontSize: 30,
-    borderBottomColor: '#e2e2e2',
-    borderBottomWidth: 2,
-  },
+    flexBody: {
+        fontWeight: "bold",
+        marginLeft: 10
+    },
 
-  textpara: {
-    justifyContent: 'center',
-    textAlign: 'justify',
-    color: '#2A2A2A',
-    fontSize: 18,
-    paddingLeft: 20,
-    paddingRight: 20,
-    borderBottomColor: '#282c34',
-  },
+    flexContainer: {
+        flex: 1,
+        flexDirection: "column",
+        paddingBottom: 70
+    },
 
-  TextStyle: {
-    color: 'blue',
-    textDecorationLine: 'underline',
-  },
+    flexDetails: {
+        marginBottom: 10,
+        marginLeft: 10
+    },
 
-  footer: {
-    alignItems: 'center',
-    paddingTop: 45,
-  },
+    flexHeading: {
+        fontWeight: "bold",
+        marginTop: 10,
+        textAlign: "center"
+    },
 
-  footerAlign: {
-    width: 50,
-    height: 20,
-  },
+    footer: {
+        alignItems: "center",
+        paddingTop: 45
+    },
 
-  flexContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    paddingBottom: 70,
-  },
+    footerAlign: {
+        height: 20,
+        width: 50
+    },
 
-  flex: {
-    backgroundColor: '#e2e2e2',
-    borderColor: '#c5c5c5',
-    borderWidth: 1,
-  },
+    image: {
+        borderRadius: 30,
+        height: "60%",
+        resizeMode: "contain",
+        width: "85%"
+    },
 
-  flexheading: {
-    fontWeight: 'bold',
-    marginTop: 10,
-    textAlign: 'center',
-  },
-  flexbody: {
-    fontWeight: 'bold',
-    marginLeft: 10,
-  },
+    imageAlign: {
+        alignItems: "center"
+    },
 
-  flexdetails: {
-    marginLeft: 10,
-    marginBottom: 10,
-  },
+    loading: {
+        alignItems: "center",
+        backgroundColor: "#F5FCFF88",
+        bottom: 0,
+        justifyContent: "center",
+        left: 0,
+        position: "absolute",
+        right: 0,
+        top: 0
+    },
 
-  body: {
-    margin: 10,
-  },
+    mainBody: {
+        backgroundColor: "#0000"
+    },
 
-  reftoke: {
-    textAlign: 'center',
-    marginBottom: 10,
-  },
+    refBody: {
+        textAlign: "center"
+    },
 
-  deco: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-    margin: 10,
-  },
+    refToken: {
+        marginBottom: 10,
+        textAlign: "center"
+    },
 
-  refbody: {
-    textAlign: 'center',
-  },
+    text: {
+        backgroundColor: "#f47421",
+        borderBottomColor: "#e2e2e2",
+        borderBottomWidth: 2,
+        color: "white",
+        fontSize: 25,
+        justifyContent: "center",
+        textAlign: "center"
+    },
+
+    textStyle: {
+        color: "blue",
+        textDecorationLine: "underline"
+    },
+
+    textpara: {
+        borderBottomColor: "#282c34",
+        color: "#2A2A2A",
+        fontSize: 18,
+        justifyContent: "center",
+        paddingLeft: 20,
+        paddingRight: 20,
+        textAlign: "justify"
+    }
 });
 
 export { styles };

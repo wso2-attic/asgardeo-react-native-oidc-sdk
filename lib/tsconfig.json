@@ -13,7 +13,6 @@
       "suppressImplicitAnyIndexErrors": true,
       "experimentalDecorators": true,
       "composite": true,
-      "allowSyntheticDefaultImports": true,
       "declarationMap": true,
       "baseUrl": "/",
       "paths": {

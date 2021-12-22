@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -15,6 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { AuthClient, AuthProvider, useAuthContext } from "./src/authenticate";
 
-export * from "./authentication-utils";
-export * from "./crypto-utils";
+export { AuthClient, AuthProvider, useAuthContext };

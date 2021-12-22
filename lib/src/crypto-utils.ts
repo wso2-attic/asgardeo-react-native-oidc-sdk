@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,26 +16,30 @@
  * under the License.
  */
 
+import {
+    CryptoUtils,
+    DecodedIDTokenPayload,
+    JWKInterface,
+    SUPPORTED_SIGNATURE_ALGORITHMS
+} from "@asgardeo/auth-js";
+import { AsgardeoAuthException } from "@asgardeo/auth-js/src/exception";
+import { decode as atob } from "base-64";
 import Base64 from "crypto-js/enc-base64";
 import utf8 from "crypto-js/enc-utf8";
 import WordArray from "crypto-js/lib-typedarrays";
 import sha256 from "crypto-js/sha256";
-// Importing from node_modules since rollup doesn't support export attribute of `package.json` yet.
-import parseJwk from "../../../../jose/dist/browser/jwk/parse";
-import jwtVerify, { KeyLike } from "../../../../jose/dist/browser/jwt/verify";
-import { AsgardeoAuthException } from "../exception";
-import { DecodedIDTokenPayload, JWKInterface } from "@asgardeo/auth-js";
+import { KEYUTIL, KJUR } from "jsrsasign";
 
-export class CryptoUtils {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    private constructor() {}
+export class ReactNativeCryptoUtils implements CryptoUtils {
+
     /**
      * Get URL encoded string.
      *
      * @param {CryptoJS.WordArray} value.
      * @returns {string} base 64 url encoded value.
      */
-    public static base64URLEncode(value: CryptoJS.WordArray): string {
+    public base64URLEncode(value: WordArray): string {
+
         return Base64.stringify(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
     }
 
@@ -44,7 +48,8 @@ export class CryptoUtils {
      *
      * @returns {string} code verifier.
      */
-    public static getCodeVerifier(): string {
+    public getCodeVerifier(): string {
+
         return this.base64URLEncode(WordArray.random(32));
     }
 
@@ -54,17 +59,9 @@ export class CryptoUtils {
      * @param {string} verifier.
      * @returns {string} code challenge.
      */
-    public static getCodeChallenge(verifier: string): string {
-        return this.base64URLEncode(sha256(verifier));
-    }
+    public getCodeChallenge(verifier: string): string {
 
-    /**
-     * Get the supported signing algorithms for the id_token.
-     *
-     * @returns {string[]} array of supported algorithms.
-     */
-    public static getSupportedSignatureAlgorithms(): string[] {
-        return ["RS256", "RS512", "RS384", "PS256"];
+        return this.base64URLEncode(sha256(verifier));
     }
 
     /**
@@ -75,30 +72,43 @@ export class CryptoUtils {
      * @returns {any} public key.
      */
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    public static getJWKForTheIdToken(jwtHeader: string, keys: JWKInterface[]): Promise<KeyLike> {
+    public async getJWKForTheIdToken(jwtHeader: string, keys: JWKInterface[]): Promise<any> {
+
         const headerJSON = JSON.parse(atob(jwtHeader));
 
         for (const key of keys) {
             if (headerJSON.kid === key.kid) {
-                return parseJwk({
-                    alg: key.alg,
-                    e: key.e,
-                    kty: key.kty,
-                    n: key.n
-                });
+                try {
+                    const jwk = KEYUTIL.getKey({
+                        alg: key.alg,
+                        e: key.e,
+                        kty: key.kty,
+                        n: key.n
+                    });
+
+                    return Promise.resolve(jwk);
+                } catch(error) {
+                    return Promise.reject(
+                        new AsgardeoAuthException(
+                            "CRYPTO_UTIL-GTFTIT-NF01",
+                            "crypto-utils",
+                            "getJWKForTheIdToken",
+                            "Failed to retrive jwk.",
+                            error
+                        )
+                    );
+                }
             }
         }
 
         return Promise.reject(
             new AsgardeoAuthException(
-                "CRYPTO_UTIL-GTFTIT-IV01",
+                "CRYPTO_UTIL-GTFTIT-IV02",
                 "crypto-utils",
                 "getJWKForTheIdToken",
                 "kid not found.",
-                "Failed to find the 'kid' specified in the id_token. 'kid' found in the header : " +
-                    headerJSON.kid +
-                    ", Expected values: " +
-                    keys.map((key) => key.kid).join(", ")
+                "Failed to find the 'kid' specified in the id_token. 'kid' found in the header : " + headerJSON.kid +
+                    ", Expected values: " + keys.map((key) => key.kid).join(", ")
             )
         );
     }
@@ -114,35 +124,24 @@ export class CryptoUtils {
      * @param {number} clockTolerance - Allowed leeway for id_tokens (in seconds).
      * @returns {Promise<boolean>} whether the id_token is valid.
      */
-    public static isValidIdToken(
+    public isValidIdToken(
         idToken: string,
-        jwk: KeyLike,
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+        jwk: any,
         clientID: string,
         issuer: string,
         username: string,
         clockTolerance: number
     ): Promise<boolean> {
-        return jwtVerify(idToken, jwk, {
-            algorithms: this.getSupportedSignatureAlgorithms(),
-            audience: clientID,
-            clockTolerance: clockTolerance,
-            issuer: issuer,
-            subject: username
-        })
-            .then(() => {
-                return Promise.resolve(true);
-            })
-            .catch((error) => {
-                return Promise.reject(
-                    new AsgardeoAuthException(
-                        "CRYPTO_UTIL-IVIT-IV02",
-                        "crypto-utils",
-                        "isValidIdToken",
-                        "Validating ID token failed",
-                        error
-                    )
-                );
-            });
+        const verification = KJUR.jws.JWS.verifyJWT(idToken, jwk, {
+            alg: SUPPORTED_SIGNATURE_ALGORITHMS,
+            aud: clientID,
+            gracePeriod: clockTolerance,
+            iss: [ issuer ],
+            sub: username
+        });
+
+        return Promise.resolve(verification);
     }
 
     /**
@@ -152,7 +151,8 @@ export class CryptoUtils {
      *
      * @return {DecodedIdTokenPayloadInterface} - The decoded payload of the id token.
      */
-    public static decodeIDToken(idToken: string): DecodedIDTokenPayload {
+    public decodeIDToken(idToken: string): DecodedIDTokenPayload {
+
         try {
             const words = Base64.parse(idToken.split(".")[1]);
             const utf8String = utf8.stringify(words);
