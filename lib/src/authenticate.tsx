@@ -21,6 +21,7 @@ import {
     AsgardeoAuthClient,
     AuthClientConfig,
     BasicUserInfo,
+    CustomGrantConfig,
     DataLayer,
     DecodedIDTokenPayload,
     GetAuthURLConfig,
@@ -103,7 +104,7 @@ const AuthProvider: FunctionComponent = (
     /**
      * This is an async method that returns a Promise which resolves with the authorization URL.
      *
-     * @param {GetAuthURLConfig} config - Auth url config.
+     * @param {GetAuthURLConfig} config - Auth url config (optional).
      * @return {Promise<string>} - A promise that resolves with the authorization URL.
      *
      * @example
@@ -115,7 +116,7 @@ const AuthProvider: FunctionComponent = (
      * });
      * ```
      */ 
-    const getAuthorizationURL = async (config: GetAuthURLConfig): Promise<string> => {
+    const getAuthorizationURL = async (config?: GetAuthURLConfig): Promise<string> => {
 
         return await AuthClient.getAuthorizationURL(config);
     };
@@ -290,10 +291,10 @@ const AuthProvider: FunctionComponent = (
      *
      * @example
      * ```
-     * const userInfo = await userInfomation();
+     * const userInfo = await getBasicUserInfo();
      * ```
      */
-    const userInformation = async (): Promise<BasicUserInfo> => {
+    const getBasicUserInfo = async (): Promise<BasicUserInfo> => {
 
         return await AuthClient.getBasicUserInfo();
     };
@@ -382,6 +383,7 @@ const AuthProvider: FunctionComponent = (
      * const pkce = await getPKCECode();
      * ```
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const getPKCECode = async (): Promise<string> => {
 
         return await AuthClient.getPKCECode();
@@ -398,9 +400,83 @@ const AuthProvider: FunctionComponent = (
      * await setPKCECode("pkce_code")
      * ```
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const setPKCECode = async (pkce: string): Promise<void> => {
 
         return await AuthClient.setPKCECode(pkce);
+    };
+
+    /**
+     * This method returns if the sign-out is successful or not.
+     *
+     * @param {string} signOutRedirectUrl - The URL to which the user has been redirected to after signing-out.
+     *
+     * @return {boolean} - `true` if successful, `false` otherwise.
+     * 
+     * @example
+     * ```
+     * const hasSignOut = isSignOutSuccessful("signOutRedirectURL");
+     * ```
+     */
+    const isSignOutSuccessful = (signOutRedirectURL: string): boolean => {
+
+        return AsgardeoAuthClient.isSignOutSuccessful(signOutRedirectURL);
+    };
+
+    /**
+     * This method updates the configuration that was passed into the constructor when instantiating this class.
+     *
+     * @param {Partial<AuthClientConfig>} config - A config object to update the SDK configurations with.
+     *
+     * @example
+     * ```
+     * const config = {
+     *     clientID: "client ID",
+     *     serverOrigin: "https://localhost:9443"
+     * }
+     *
+     * await updateConfig(config);
+     */
+    const updateConfig = async (config: Partial<AuthClientConfig>): Promise<void> => {
+
+        return await AuthClient.updateConfig(config);
+    };
+
+
+    /**
+     * This method sends a custom-grant request and returns a Promise that resolves with the response
+     * depending on the config passed.
+     *
+     * @param {CustomGrantConfig} config - A config object containing the custom grant configurations.
+     *
+     * @return {Promise<any>} - A Promise that resolves with the response depending on your configurations.
+     *
+     * @example
+     * ```
+     * const config = {
+     *   attachToken: false,
+     *   data: {
+     *       client_id: "{{clientID}}",
+     *       grant_type: "account_switch",
+     *       scope: "{{scope}}",
+     *       token: "{{token}}",
+     *   },
+     *   id: "account-switch",
+     *   returnResponse: true,
+     *   returnsSession: true,
+     *   signInRequired: true
+     * }
+     *
+     * requestCustomGrant(config).then((response) => {
+     *     console.log(response);
+     * }).catch((error) => {
+     *     console.error(error);
+     * });
+     * ```
+     */
+    const requestCustomGrant = async (config: CustomGrantConfig): Promise<any> => {
+
+        return await AuthClient.requestCustomGrant(config);
     };
 
     /**
@@ -448,21 +524,22 @@ const AuthProvider: FunctionComponent = (
             value={ {
                 getAccessToken,
                 getAuthorizationURL,
+                getBasicUserInfo,
                 getDataLayer,
                 getDecodedIDToken,
                 getIDToken,
                 getOIDCServiceEndpoints,
-                getPKCECode,
                 getSignOutURL,
                 initialize,
                 isAuthenticated,
+                isSignOutSuccessful,
                 refreshAccessToken,
+                requestCustomGrant,
                 revokeAccessToken,
-                setPKCECode,
                 signIn,
                 signOut,
                 state,
-                userInformation
+                updateConfig
             } }
         >
             { props.children }

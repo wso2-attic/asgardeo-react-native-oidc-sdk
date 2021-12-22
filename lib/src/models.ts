@@ -19,6 +19,7 @@
 import {
     AuthClientConfig,
     BasicUserInfo,
+    CustomGrantConfig,
     DataLayer,
     DecodedIDTokenPayload,
     GetAuthURLConfig,
@@ -38,22 +39,23 @@ export interface AuthStateInterface {
 
 export interface AuthContextInterface {
     state: AuthStateInterface;
+    isSignOutSuccessful: (signOutRedirectURL: string) => boolean;
     initialize: (config: AuthClientConfig) => Promise<void>;
     getDataLayer: () => Promise<DataLayer<any>>;
-    getAuthorizationURL: (config: GetAuthURLConfig) => Promise<string>;
+    getAuthorizationURL: (config?: GetAuthURLConfig) => Promise<string>;
     signIn: () => Promise<void>;
     refreshAccessToken: () => Promise<TokenResponse>;
     getSignOutURL: () => Promise<string>;
     signOut: () => Promise<void>;
     getOIDCServiceEndpoints: () => Promise<OIDCEndpoints>;
     getDecodedIDToken: () => Promise<DecodedIDTokenPayload>;
-    userInformation: () => Promise<BasicUserInfo>;
+    getBasicUserInfo: () => Promise<BasicUserInfo>;
     revokeAccessToken: () => Promise<any>;
     getAccessToken: () => Promise<string>;
     getIDToken: () => Promise<string>;
     isAuthenticated: () => Promise<boolean>;
-    getPKCECode: () => Promise<string>;
-    setPKCECode: (pkce: string) => Promise<void>;
+    updateConfig: (config: Partial<AuthClientConfig>) => Promise<void>;
+    requestCustomGrant: (config: CustomGrantConfig) => Promise<any>;
 }
 
 export type AuthUrl = {

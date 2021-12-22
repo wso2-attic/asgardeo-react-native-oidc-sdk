@@ -34,7 +34,7 @@ const config = {
 const LoginScreen = (props: { navigation: { navigate: (arg0: string) => void; }; }) => {
 
     const { loginState, setLoginState, loading, setLoading } = useLoginContext();
-    const { state, initialize, signIn, userInformation, getIDToken, getDecodedIDToken } = useAuthContext();
+    const { state, initialize, signIn, getBasicUserInfo, getIDToken, getDecodedIDToken } = useAuthContext();
 
     /**
      * This hook will initialize the auth provider with the config object.
@@ -50,7 +50,7 @@ const LoginScreen = (props: { navigation: { navigate: (arg0: string) => void; };
         if (state?.isAuthenticated) {
             const getData = async () => {
                 try {
-                    const basicUserInfo = await userInformation();
+                    const basicUserInfo = await getBasicUserInfo();
                     const idToken = await getIDToken();
                     const decodedIDToken = await getDecodedIDToken();
               
