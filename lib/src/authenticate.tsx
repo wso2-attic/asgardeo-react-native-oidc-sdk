@@ -115,7 +115,7 @@ const AuthProvider: FunctionComponent = (
      *     console.error(error);
      * });
      * ```
-     */ 
+     */
     const getAuthorizationURL = async (config?: GetAuthURLConfig): Promise<string> => {
 
         return await AuthClient.getAuthorizationURL(config);
@@ -123,9 +123,9 @@ const AuthProvider: FunctionComponent = (
 
     /**
      * This function obtains the authorization url and perform the signin redirection.
-     * 
+     *
      * @return {Promise<void>}
-     * 
+     *
      * @example
      * ```
      * signIn()
@@ -169,10 +169,11 @@ const AuthProvider: FunctionComponent = (
 
         const urlObject = url.parse(authUrl.url);
         const dataList = urlObject.query.split("&");
-        const code = dataList[0].split("=")[1];
-        const sessionState = dataList[1].split("=")[1];
+        const code = dataList[ 0 ].split("=")[ 1 ];
+        const state = dataList[ 1 ].split("=")[ 1 ];
+        const sessionState = dataList[ 2 ].split("=")[ 1 ];
 
-        const authState = await AuthClient.requestAccessToken(code, sessionState);
+        const authState = await AuthClient.requestAccessToken(code, sessionState, state);
 
         /**
          * TODO: Remove this waiting once https://github.com/asgardeo/asgardeo-auth-js-sdk/issues/164 is fixed.
@@ -230,7 +231,7 @@ const AuthProvider: FunctionComponent = (
      * This method clears all authentication data and returns the sign-out URL.
      *
      * @return  {Promise<void>}
-     * 
+     *
      * @example
      * ```
      * signOut();
@@ -394,7 +395,7 @@ const AuthProvider: FunctionComponent = (
      *
      * @param {string} pkce - The PKCE code.
      * @return  {Promise<void>}
-     * 
+     *
      * @example
      * ```
      * await setPKCECode("pkce_code")
@@ -412,7 +413,7 @@ const AuthProvider: FunctionComponent = (
      * @param {string} signOutRedirectUrl - The URL to which the user has been redirected to after signing-out.
      *
      * @return {boolean} - `true` if successful, `false` otherwise.
-     * 
+     *
      * @example
      * ```
      * const hasSignOut = isSignOutSuccessful("signOutRedirectURL");
@@ -481,7 +482,7 @@ const AuthProvider: FunctionComponent = (
 
     /**
      * This function will handle authentication/ signout redirections.
-     * 
+     *
      * @param {AuthUrl} authUrl - redirection url.
      * @return  {Promise<void>}
      */
@@ -492,7 +493,7 @@ const AuthProvider: FunctionComponent = (
             } else if (url.parse(authUrl?.url)?.query.indexOf("state=sign_out") > -1) {
                 const dataList = url.parse(authUrl?.url)?.query.split("&");
                 const authState = dataList[0].split("=")[1];
-        
+
                 if (authState === "sign_out_success") {
                     try {
                         await AuthClient.getDataLayer().removeOIDCProviderMetaData();
