@@ -131,8 +131,8 @@ const AuthProvider: FunctionComponent = (
      * signIn()
      * ```
      */
-    const signIn = async (): Promise<void> => {
-        await AuthClient.getAuthorizationURL()
+    const signIn = async (config?: GetAuthURLConfig): Promise<void> => {
+        await AuthClient.getAuthorizationURL(config)
             .then((url) => {
                 Linking.openURL(url);
             })

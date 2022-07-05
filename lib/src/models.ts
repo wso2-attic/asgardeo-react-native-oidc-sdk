@@ -43,7 +43,7 @@ export interface AuthContextInterface {
     initialize: (config: AuthClientConfig) => Promise<void>;
     getDataLayer: () => Promise<DataLayer<any>>;
     getAuthorizationURL: (config?: GetAuthURLConfig) => Promise<string>;
-    signIn: () => Promise<void>;
+    signIn: (config?: GetAuthURLConfig) => Promise<void>;
     refreshAccessToken: () => Promise<TokenResponse>;
     getSignOutURL: () => Promise<string>;
     signOut: () => Promise<void>;
