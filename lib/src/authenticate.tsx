@@ -42,7 +42,8 @@ const initialState: AuthStateInterface = {
     isAuthenticated: false,
     refreshToken: "",
     scope: "",
-    tokenType: ""
+    tokenType: "",
+    authResponseError: {}
 };
 
 // Instantiate the auth client object.
@@ -510,6 +511,14 @@ const AuthProvider: FunctionComponent = (
                         );
                     }
                 }
+            } else if (url.parse(authUrl?.url)?.query.indexOf("error_description=") > -1) {
+                const dataList = url.parse(authUrl?.url)?.query.split("&");
+                const errorDescription = dataList[0].split("=")[1];
+                const errorCode = dataList[2].split("=")[1];
+                const errorMessage = errorDescription.split("+").join(" ");
+                
+                const error = { errorCode, errorMessage };
+                setState({ ...state, authResponseError: error });
             } else {
                 // TODO: Add logs when a logger is available.
                 // Tracked here https://github.com/asgardeo/asgardeo-auth-js-sdk/issues/151.
@@ -518,6 +527,13 @@ const AuthProvider: FunctionComponent = (
             // TODO: Add logs when a logger is available.
             // Tracked here https://github.com/asgardeo/asgardeo-auth-js-sdk/issues/151.
         }
+    };
+
+    /**
+     * This method clear the authentication response errors from state
+     */
+     const clearAuthResponseError = () : void => {
+        setState({ ...state, authResponseError: {} });
     };
 
     return (
@@ -540,7 +556,8 @@ const AuthProvider: FunctionComponent = (
                 signIn,
                 signOut,
                 state,
-                updateConfig
+                updateConfig,
+                clearAuthResponseError
             } }
         >
             { props.children }
