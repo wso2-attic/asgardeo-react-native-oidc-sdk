@@ -35,6 +35,7 @@ export interface AuthStateInterface {
     refreshToken: string;
     tokenType: string;
     isAuthenticated: boolean;
+    authResponseError?: {errorCode?: string, errorMessage?: string};
 }
 
 export interface AuthContextInterface {
@@ -56,6 +57,7 @@ export interface AuthContextInterface {
     isAuthenticated: () => Promise<boolean>;
     updateConfig: (config: Partial<AuthClientConfig>) => Promise<void>;
     requestCustomGrant: (config: CustomGrantConfig) => Promise<any>;
+    clearAuthResponseError: () => void;
 }
 
 export type AuthUrl = {
