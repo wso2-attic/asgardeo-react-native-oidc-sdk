@@ -532,7 +532,7 @@ const AuthProvider: FunctionComponent = (
     /**
      * This method clear the authentication response errors from state
      */
-     const clearAuthResponseError = () : void => {
+    const clearAuthResponseError = () : void => {
         setState({ ...state, authResponseError: {} });
     };
 
