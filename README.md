@@ -2,7 +2,7 @@
 
 ## :warning: Warning!
 ### React Native SDK is no longer encoraged and enriched by Asgardeo and may not work with the latest versions.
-### You can implement login using [Authorization Code flow](https://wso2.com/asgardeo/docs/guides/authentication/oidc/implement-auth-code/#prerequisites) with Asgardeo using OIDC standards.
+### You can implement login using [Authorization Code flow with PKCE](https://wso2.com/asgardeo/docs/guides/authentication/oidc/implement-auth-code-with-pkce/#prerequisites) with Asgardeo using OIDC standards.
 
 Repository containing the source of Asgardeo React Native OIDC SDK & Samples.
 
